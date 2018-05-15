@@ -48,11 +48,24 @@ class SuperAdmin {
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         
-        return $stmt;
+        $num = $stmt->rowcount();
+        if($num>0){
+            $query = "UPDATE tbladmin SET IsSessionActive = 1 WHERE Email = '" . $username . "' OR PhoneNo = '" . $username . "'";
+            //echo $query;
+            $stmtupdate = $this->conn->prepare($query);
+            if(!$stmtupdate->execute()){
+                echo '{"Key" : "session Failed"}';
+                return null;
+            }
+            return $stmt;
+        }else{
+            return null;
+        }
+       
 
     }
 
-    function ChangePassword($Adminid, $newpassword){
+    function ChangePassword($Adminid, $newpassword, $oldsendPassword){
 
         $query = "SELECT * FROM " . $this->table_name . " WHERE AdminId = " . $Adminid;
         $stmt = $this->conn->prepare($query);
@@ -60,27 +73,33 @@ class SuperAdmin {
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         extract($row);
 
-        if ($Password == $newpassword ){
-            return "same";
-        }elseif($newpassword == $OldPassword)
-            return "oldsame";
-        else{
-            $query = "UPDATE " . $this->table_name . " SET Password = :newpassword , OldPassword = :password 
-                    WHERE AdminId = :adminid";
-            //echo $query;
-            $stmt = $this->conn->prepare($query);
-            $stmt->bindparam(':newpassword',$newpassword);
-            $stmt->bindparam(':password',$Password);
-            $stmt->bindparam(':adminid',$Adminid);
-            $stmt->execute();
-            
-            if($stmt->rowcount() > 0) {
-                return '1';
-            }else{
-                return '0';
+        if($oldsendPassword == $Password){
+            if ($Password == $newpassword ){
+                return '{ "key" : "same" }';
+            }elseif($newpassword == $OldPassword)
+                return '{ "key" : "oldsame" }';
+            else{
+                $query = "UPDATE " . $this->table_name . " SET Password = :newpassword , OldPassword = :password 
+                        WHERE AdminId = :adminid";
+                //echo $query;
+                $stmt = $this->conn->prepare($query);
+                $stmt->bindparam(':newpassword',$newpassword);
+                $stmt->bindparam(':password',$Password);
+                $stmt->bindparam(':adminid',$Adminid);
+                $stmt->execute();
+                
+                if($stmt->rowcount() > 0) {
+                    return '{ "key" : "true" }';
+                }else{
+                    return '{ "key" : "false" }';
+                }
+    
             }
+        }else{
+            return '{ "key" : "incorrect" }';
+        }
 
-        }  
+          
     }
 
     function UpdateInfo(){
