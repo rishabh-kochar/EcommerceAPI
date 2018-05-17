@@ -1,0 +1,7 @@
+Php.ini 
+Change this line
+;extension=php_openssl.dll
+to 
+extension=php_openssl.dll
+Restart Your WampServer
+

@@ -17,16 +17,17 @@ $password = $data->password;
 //$password = "rishabh";
 
 $stmt = $SuperAdmin->CheckLogin($username,$password);
-$num = $stmt->rowCount();
+if($stmt != null){
+    $num = $stmt->rowCount();
+}else{
+    $num = 0;
+}
+
 
 if($num>0){
  
-    // products array
     $SuperAdmin_arr=array();
    
- 
-    // retrieve our table contents
-    
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     extract($row);
     
@@ -39,14 +40,15 @@ if($num>0){
         "Password" => $Password,
         "OldPassword" => $OldPassword,
         "CreatedOn" => $CreatedOn,
-        "PasswordUpdatedOn" => $PasswordUpdatedOn
+        "PasswordUpdatedOn" => $PasswordUpdatedOn,
+        "IsSessionActive" => $IsSessionActive
     );
         
     echo json_encode($SuperAdmin_arr);
 }
  
 else{
-    echo "0";
+    echo '{"key" : "false"}';
 }
 
 ?>

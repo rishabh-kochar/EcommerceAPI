@@ -8,6 +8,17 @@ $db = $database->getConnection();
  
 $SuperAdmin = new SuperAdmin($db);
 //$SuperAdmin->ReadInfo();
-$SuperAdmin->ForgetPassword(1,"9016111959");
+
+$data = json_decode(file_get_contents("php://input"));
+
+$username = $data->username;
+
+$res = $SuperAdmin->ForgetPassword($username);
+
+if($res == "0"){
+    echo '{ "key" : "false"}';
+}else{
+    echo '{ "key" : "true"}';
+}
 
 ?>

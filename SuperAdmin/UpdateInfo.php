@@ -18,9 +18,9 @@ $SuperAdmin->phone_no = $data->phone_no;
 $SuperAdmin->email = $data->email;
  
 if($SuperAdmin->UpdateInfo()){
-    echo "1";
+    echo json_encode('{ "key" : "true"}');
 }
 else{
-   echo "0";
+    echo json_encode('{ "key" : "false"}');
 }
 ?>
