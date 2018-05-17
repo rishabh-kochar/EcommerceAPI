@@ -17,7 +17,12 @@ $password = $data->password;
 //$password = "rishabh";
 
 $stmt = $SuperAdmin->CheckLogin($username,$password);
-$num = $stmt->rowCount();
+if($stmt != null){
+    $num = $stmt->rowCount();
+}else{
+    $num = 0;
+}
+
 
 if($num>0){
  
