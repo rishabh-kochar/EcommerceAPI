@@ -20,9 +20,13 @@ $verificationcode = $data->verificationcode;
 $res = $SuperAdmin->ResetPassword($newpassword,$username,$verificationcode);
 
 if($res == "0"){
-    echo json_encode('{ "key" : "false"}');
-}else{
-    echo json_encode('{ "key" : "true"}');
+    echo '{ "key" : "false"}';
+}elseif($res == "1"){
+    echo '{ "key" : "true"}';
+}elseif($res == "2"){
+    echo '{ "key" : "same"}';
+}elseif($res == "3"){
+    echo '{ "key" : "oldsame"}';
 }
 
 ?>

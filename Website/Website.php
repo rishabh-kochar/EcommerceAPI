@@ -2,7 +2,7 @@
 
 include_once '../config/database.php';
 
-class SuperAdmin {
+class Website {
  
     // database connection and table name
     private $conn;
@@ -96,7 +96,26 @@ class SuperAdmin {
         return false;
     }
 
-   
+   function mailSetting(){
+
+    $query = "UPDATE " . $this->table_name . "SET Email=:Email, Password=:Password WHERE id=:id";
+
+    $stmt = $this->conn->prepare($query);
+
+    $this->Email=htmlspecialchars(strip_tags($this->Email));
+    $this->Password=htmlspecialchars(strip_tags($this->Password));
+
+    $stmt->bindParam(":Email", $this->Email);
+    $stmt->bindParam(":Password", $this->Password);
+    $stmt->bindParam(":id", $this->id);
+
+    if($stmt->execute()){
+        return true;
+    }
+ 
+    return false;
+
+   }
 
     
 }

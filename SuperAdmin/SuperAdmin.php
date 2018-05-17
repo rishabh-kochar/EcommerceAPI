@@ -81,13 +81,13 @@ class SuperAdmin {
                 return '{ "key" : "oldsame" }';
             else{
                 $query = "UPDATE " . $this->table_name . " SET Password = :newpassword , OldPassword = :password 
-                        . PasswordUpdatedOn=:passwordupdatedon WHERE AdminId = :adminid";
+                        , PasswordUpdatedOn=:passwordupdatedon WHERE AdminId = :adminid";
                 //echo $query;
                 $stmt = $this->conn->prepare($query);
                 $stmt->bindparam(':newpassword',$newpassword);
                 $stmt->bindparam(':password',$Password);
                 $stmt->bindparam(':adminid',$Adminid);
-                $stmt->bindparam(':passwordupdatedon',date('Y-m-d H:i:s');
+                $stmt->bindparam(':passwordupdatedon',date('Y-m-d H:i:s'));
                 $stmt->execute();
                 
                 if($stmt->rowcount() > 0) {
@@ -106,7 +106,7 @@ class SuperAdmin {
 
     function UpdateInfo(){
 
-        $query = "UPDATE " . $this->table_name . "SET AdminName=:adminname, AdminImage=:adminimage, PhoneNo=:phonene,
+        $query = "UPDATE " . $this->table_name . "SET AdminName=:adminname, PhoneNo=:phonene,
                     Email=:email WHERE AdminId=:adminid";
      
         echo $query;
@@ -115,7 +115,6 @@ class SuperAdmin {
      
         // sanitize
         $this->AdminName=htmlspecialchars(strip_tags($this->AdminName));
-        $this->AdminImage=htmlspecialchars(strip_tags($this->AdminImage));
         $this->phone_no=htmlspecialchars(strip_tags($this->phone_no));
         $this->email=htmlspecialchars(strip_tags($this->email));
         $this->id=htmlspecialchars(strip_tags($this->id));
@@ -123,7 +122,6 @@ class SuperAdmin {
      
         // bind values
         $stmt->bindParam(":adminname", $this->AdminName);
-        $stmt->bindParam(":adminimage", $this->AdminImage);
         $stmt->bindParam(":phonene", $this->phone_no);
         $stmt->bindParam(":email", $this->email);
         $stmt->bindParam(":adminid", $this->id);
@@ -145,20 +143,16 @@ class SuperAdmin {
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         extract($row);
 
-        $query = "SELECT * FROM tblwebsite WHERE id = 1";
-        $websitestmt = $this->conn->prepare($query);
-        $websitestmt->execute();
-        $websitedata = $websitestmt->fetch(PDO::FETCH_ASSOC);
+       
         
 
         if($username == $PhoneNo || $username == $Email ){
 
-            //echo  . "\n";
-            //echo  . "\n";
-            //echo  . "\n";
-           
 
-
+                $query = "SELECT * FROM tblwebsite WHERE id = 1";
+                $websitestmt = $this->conn->prepare($query);
+                $websitestmt->execute();
+                $websitedata = $websitestmt->fetch(PDO::FETCH_ASSOC);
                 $mail = new PHPMailer();
 
                 // set mailer to use SMTP
@@ -185,6 +179,17 @@ class SuperAdmin {
                 $mail->From = $websitedata['Email'] ;
                 $mail->FromName = $websitedata['Name'] ;
 
+                // Random String
+                do{
+
+                    $randomString = $this->randompassword(10);
+                    $query = "UPDATE " . $this->table_name . " SET RandomString = '" . $randomString ."', RandomStringTime = '" . date('Y-m-d H:i:s') . "' WHERE Email = '" . $username . "' OR PhoneNo = '" . $username . "'";
+                    //echo $query;
+                    $stmt = $this->conn->prepare($query);
+
+                }while(!$stmt->execute());
+
+
                 // below we want to set the email address we will be sending our email to.
                 $mail->AddAddress($Email);
 
@@ -194,6 +199,7 @@ class SuperAdmin {
                 $mail->Subject = "Reset Password";
                 $generatedPassword = $this->randompassword(8);
                 $message = '<h1>Hello ' . $AdminName . ',</h1>';
+                $message .= '<p>To Reset Password <a href="http://localhost:4200/reset?rand=' . $randomString . '&type=admin">Click Here</a></p>';
                 $message .= '<p> Your Verification Code is : <b>' . $generatedPassword . '</b> </p>';
         
                 
@@ -222,6 +228,8 @@ class SuperAdmin {
 
                 
         
+        }else{
+            return "2";
         }
 
        
@@ -244,8 +252,69 @@ class SuperAdmin {
         $num = $stmt->rowcount();
         if($num>0){
 
-            $query = "UPDATE " . $this->table_name . " SET ";
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if($row['Password'] == $newpassword){
+                return "2";
+            }elseif($row['OldPassword'] == $newpassword){
+                return "3";
+            }else{
+                $time = date('Y-m-d H:i:s');
+
+                $query = "UPDATE " . $this->table_name . " SET Password = :newpassword , OldPassword = :password 
+                , PasswordUpdatedOn=:passwordupdatedon WHERE AdminId = :adminid";
+                //echo $query;
+                $stmt = $this->conn->prepare($query);
+                $stmt->bindparam(':newpassword',$newpassword);
+                $stmt->bindparam(':password',$row['Password']);
+                $stmt->bindparam(':adminid',$row['AdminId']);
+                $stmt->bindparam(':passwordupdatedon',$time);
+                $stmt->execute();
+                return "1";
+            }
+            
+        }else{
+            return "0";
         }
+
+    }
+
+    function RandomString($rand){
+        $query = "SELECT * FROM " . $this->table_name . " WHERE RandomString ='" . $rand ."'"; 
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+
+        $num = $stmt->rowcount();
+        if($num>0){
+            return $stmt;
+
+        }else{
+            return null;
+        }
+
+    }
+
+    function AdminImageUpdate(){
+
+        $query = "UPDATE " . $this->table_name . "SET AdminImage=:Adminimage WHERE AdminId=:adminid";
+     
+        echo $query;
+        // prepare query
+        $stmt = $this->conn->prepare($query);
+     
+        // sanitize
+        $this->AdminImage=htmlspecialchars(strip_tags($this->AdminImage));
+        
+        // bind values
+        $stmt->bindParam(":Adminimage", $this->AdminImage);
+        
+     
+        // execute query
+        if($stmt->execute()){
+            return true;
+        }
+     
+        return false;
 
     }
 
