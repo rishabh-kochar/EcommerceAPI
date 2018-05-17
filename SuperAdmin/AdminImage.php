@@ -10,13 +10,10 @@ $SuperAdmin = new SuperAdmin($db);
  
 $data = json_decode(file_get_contents("php://input"));
  
+$SuperAdmin->AdminImage = $data->AdminImage;
 $SuperAdmin->AdminId = $data->AdminId;
  
-$SuperAdmin->AdminName = $data->AdminName;
-$SuperAdmin->phone_no = $data->phone_no;
-$SuperAdmin->email = $data->email;
- 
-if($SuperAdmin->UpdateInfo()){
+if($SuperAdmin->AdminImageUpdate()){
     echo json_encode('{ "key" : "true"}');
 }
 else{
