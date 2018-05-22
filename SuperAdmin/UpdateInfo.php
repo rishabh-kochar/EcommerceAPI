@@ -10,16 +10,19 @@ $SuperAdmin = new SuperAdmin($db);
  
 $data = json_decode(file_get_contents("php://input"));
  
-$SuperAdmin->AdminId = $data->AdminId;
+$SuperAdmin->id = $data->AdminId;
+$SuperAdmin->logo = $data->logo;
+
+// $SuperAdmin->id = 1;
+// $SuperAdmin->AdminName = "Rishi";
+// $SuperAdmin->phone_no = "7622060475";
+// $SuperAdmin->email = "rishabhkochar85@yahoo.com";
  
-$SuperAdmin->AdminName = $data->AdminName;
-$SuperAdmin->phone_no = $data->phone_no;
-$SuperAdmin->email = $data->email;
- 
+
 if($SuperAdmin->UpdateInfo()){
-    echo json_encode('{ "key" : "true"}');
+    echo '{ "key" : "true"}';
 }
 else{
-    echo json_encode('{ "key" : "false"}');
+    echo '{ "key" : "false"}';
 }
 ?>

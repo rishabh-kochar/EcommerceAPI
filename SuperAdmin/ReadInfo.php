@@ -7,7 +7,12 @@ $database = new Database();
 $db = $database->getConnection();
 
 $SuperAdmin = new SuperAdmin($db);
-$stmt = $SuperAdmin->ReadInfo();
+
+$data = json_decode(file_get_contents("php://input"));
+
+$id = $data->ID;
+
+$stmt = $SuperAdmin->ReadInfo($id);
 $num = $stmt->rowCount();
  //echo $num;
 // check if more than 0 record found
