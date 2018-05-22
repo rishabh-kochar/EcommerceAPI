@@ -51,14 +51,16 @@ if(isset($_FILES['image'])){
         if($stmt->rowcount()>0){
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             extract($row);
-            unlink($target_dir.$Logo);
+            if($Logo != "" && file_exists($target_dir.$Logo))
+                unlink($target_dir.$Logo);
         }
 
         // $file_name = "adminImage_" . $_POST['AdminId'] . $ImageExt;
         //$file_name = "adminImage_" . $_POST['AdminId'] . "." . $file_ext;
         //echo $target_dir . $file_name;
-        $newFileName = $rand . "_" . $file_name;
         $rand = date('YmdHis');
+        $newFileName = $rand . "_" . $file_name;
+        
        move_uploaded_file($file_tmp , $target_dir . $newFileName );
        $Website->Logo = $newFileName;
         $Website->id = $_POST['Id'];

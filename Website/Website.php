@@ -42,29 +42,32 @@ class Website {
 
     function Create($id){
 
-        if(id == "new"){
-            $query = "INSERT INTO " . $this->table_name . "(id, Name, Logo, LogoAlt, Email, PhoneNo,
+        if($id == "new"){
+            $query = "INSERT INTO " . $this->table_name . "(Name, PhoneNo,
                      AboutUs, ContactUs, FacebookLink, TwitterLink, InstagramLink, YoutubeLink, GSTNo, 
-                     CreatedOn, TagLine) values (:id,:Name,:Logo,:Logoalt,:Email,:PhoneNo,:AbouUs,:ContactUs,:FacebookLink,
-                     :TwitterLink,:InstagramLink,:YoutubeLink,:GstNo,:CreatedOn,:TagLine);" ;
+                     CreatedOn, TagLine) values (:Name,:PhoneNo,:AboutUs,:ContactUs,:FacebookLink,
+                     :TwitterLink,:InstagramLink,:YoutubeLink,:GSTNo,:CreatedOn,:TagLine);" ;
         }else{
-            $query = "UPDATE " . $this->table_name . "SET Name=:Name,Logo=:Logo, Logoalt=:Logoalt, Email=:Email, PhoneNo=:PhoneNo
-                        AbouUs=:AbouUs, ContactUs=:ContactUs, FacebookLink=:FacebookLink, TwitterLink=:TwitterLink,
-                        InstagramLink=:InstagramLink, YoutubeLink=:YoutubeLink, GstNo=:GstNo, TagLine=:TagLine, 
-                        LastUpdatedOn:=LastUpdatedOn WHERE id=:id";
+            $query = "UPDATE " . $this->table_name . " SET Name=:Name, PhoneNo=:PhoneNo,
+                        AboutUs=:AboutUs, ContactUs=:ContactUs, FacebookLink=:FacebookLink, TwitterLink=:TwitterLink,
+                        InstagramLink=:InstagramLink, YoutubeLink=:YoutubeLink, GSTNo=:GSTNo, TagLine=:TagLine, 
+                        LastUpdatedOn=:LastUpdatedOn WHERE id=:id";
         }
        
      
-        //echo $query;
+        echo $query;
         // prepare query
         $stmt = $this->conn->prepare($query);
      
+        if($id == "new"){
+            $stmt->bindParam(":CreatedOn", $this->CreatedOn);
+        }else{
+            $stmt->bindParam(":id", $this->id);
+            $stmt->bindParam(":LastUpdatedOn", $this->lastUpdatedOn);
+        }
         // bind values
-        $stmt->bindParam(":id", $this->id);
+     
         $stmt->bindParam(":Name", $this->Name);
-        $stmt->bindParam(":Logo", $this->Logo);
-        $stmt->bindParam(":LogoAlt", $this->LogoAlt);
-        $stmt->bindParam(":Email", $this->Email);
         $stmt->bindParam(":PhoneNo", $this->PhoneNo);
         $stmt->bindParam(":AboutUs", $this->AboutUs);
         $stmt->bindParam(":ContactUs", $this->ContactUs);
@@ -73,9 +76,8 @@ class Website {
         $stmt->bindParam(":TwitterLink", $this->TwitterLink);
         $stmt->bindParam(":InstagramLink", $this->InstagramLink);
         $stmt->bindParam(":TagLine", $this->TagLine);
-        $stmt->bindParam(":CreatedOn", $this->CreatedOn);
-        $stmt->bindParam(":lastUpdatedOn", $this->lastUpdatedOn);
         $stmt->bindParam(":GSTNo", $this->GSTNo);
+       
         
         // execute query
         if($stmt->execute()){

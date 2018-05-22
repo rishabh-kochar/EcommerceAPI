@@ -84,11 +84,12 @@ class SuperAdmin {
                 $query = "UPDATE " . $this->table_name . " SET Password = :newpassword , OldPassword = :password 
                         , PasswordUpdatedOn=:passwordupdatedon WHERE AdminId = :adminid";
                 //echo $query;
+                $date = date('Y-m-d H:i:s');
                 $stmt = $this->conn->prepare($query);
                 $stmt->bindparam(':newpassword',$newpassword);
                 $stmt->bindparam(':password',$Password);
                 $stmt->bindparam(':adminid',$Adminid);
-                $stmt->bindparam(':passwordupdatedon',date('Y-m-d H:i:s'));
+                $stmt->bindparam(':passwordupdatedon',$date);
                 $stmt->execute();
                 
                 if($stmt->rowcount() > 0) {

@@ -31,12 +31,12 @@ if($userType == "superadmin"){
     }
 }elseif($userType == "shop"){
     if($operation == "get"){
-        $query = "SELECT * FROM tblshops WHERE Email = '" . $Id ."'" . "' OR PhoneNo = '" . $Id . "'";
+        $query = "SELECT * FROM tblshops WHERE UserName = '" . $Id ."'";
     }elseif($operation == "set"){
         if($status == "1")
-            $query = "UPDATE tblshops SET IsSessionActive = 1 WHERE Email = '" . $Id . "' OR PhoneNo = '" . $Id . "'";
+            $query = "UPDATE tblshops SET IsSessionActive = 1 WHERE UserName = '" . $Id ."'";
         elseif($status == "0")
-            $query = "UPDATE tblshops SET IsSessionActive = 0 WHERE Email = '" . $Id . "' OR PhoneNo = '" . $Id . "'";
+            $query = "UPDATE tblshops SET IsSessionActive = 0 WHERE UserName = '" . $Id ."'";
     }
 }
 

@@ -40,14 +40,42 @@ if($num>0){
         "GSTNo" => $GSTNo,
         "CreatedOn" => $CreatedOn,
         "LastUpdatedOn" => $LastUpdatedOn,
-        "TagLine" => $TagLine
+        "TagLine" => $TagLine,
+        "Logo" => $Logo,
+        "LogoAlt" => $LogoAlt
+
     );
         
     echo json_encode($SuperAdmin_arr);
 }
  
 else{
-    echo '{"key":"false"}';
+     $SuperAdmin_arr=array();
+   
+ 
+    // retrieve our table contents
+    
+    
+    
+    $SuperAdmin_arr=array(
+        "Id" => "new",
+        "Name" => "",
+        "PhoneNo" => "",
+        "AboutUs" => "",
+        "ContactUs" => "",
+        "FacebookLink" => "",
+        "TwitterLink" => "",
+        "InstagramLink" => "",
+        "YoutubeLink" => "",
+        "GSTNo" => "",
+        "CreatedOn" => "",
+        "LastUpdatedOn" => "",
+        "TagLine" => "",
+        "Logo" => "",
+        "LogoAlt" => ""
+    );
+        
+    echo json_encode($SuperAdmin_arr);
 }
 
 ?>
