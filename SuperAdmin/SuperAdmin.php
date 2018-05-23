@@ -19,16 +19,17 @@ class SuperAdmin {
     public $oldpassword;
     public $createdon;
     public $passwordupdatedon;
+    public $logo;
 
     // constructor with $db as database connection
     public function __construct($db){
         $this->conn = $db;
     }
 
-    function ReadInfo(){
+    function ReadInfo($id){
  
         // select all query
-        $query = "SELECT * FROM " . $this->table_name;
+        $query = "SELECT * FROM " . $this->table_name . " WHERE Adminid = " . $id;
 
         // prepare query statement
         // echo $query;
@@ -83,11 +84,12 @@ class SuperAdmin {
                 $query = "UPDATE " . $this->table_name . " SET Password = :newpassword , OldPassword = :password 
                         , PasswordUpdatedOn=:passwordupdatedon WHERE AdminId = :adminid";
                 //echo $query;
+                $date = date('Y-m-d H:i:s');
                 $stmt = $this->conn->prepare($query);
                 $stmt->bindparam(':newpassword',$newpassword);
                 $stmt->bindparam(':password',$Password);
                 $stmt->bindparam(':adminid',$Adminid);
-                $stmt->bindparam(':passwordupdatedon',date('Y-m-d H:i:s'));
+                $stmt->bindparam(':passwordupdatedon',$date);
                 $stmt->execute();
                 
                 if($stmt->rowcount() > 0) {
@@ -106,10 +108,10 @@ class SuperAdmin {
 
     function UpdateInfo(){
 
-        $query = "UPDATE " . $this->table_name . "SET AdminName=:adminname, PhoneNo=:phonene,
+        $query = "UPDATE " . $this->table_name . " SET AdminName=:adminname, PhoneNo=:phoneno,
                     Email=:email WHERE AdminId=:adminid";
      
-        echo $query;
+        //echo $query;
         // prepare query
         $stmt = $this->conn->prepare($query);
      
@@ -119,14 +121,16 @@ class SuperAdmin {
         $this->email=htmlspecialchars(strip_tags($this->email));
         $this->id=htmlspecialchars(strip_tags($this->id));
       
-     
+        //echo $this->AdminName;
+        //echo $this->phone_no;
+
         // bind values
         $stmt->bindParam(":adminname", $this->AdminName);
-        $stmt->bindParam(":phonene", $this->phone_no);
+        $stmt->bindParam(":phoneno", $this->phone_no);
         $stmt->bindParam(":email", $this->email);
         $stmt->bindParam(":adminid", $this->id);
         
-     
+        
         // execute query
         if($stmt->execute()){
             return true;
@@ -262,7 +266,7 @@ class SuperAdmin {
                 $time = date('Y-m-d H:i:s');
 
                 $query = "UPDATE " . $this->table_name . " SET Password = :newpassword , OldPassword = :password 
-                , PasswordUpdatedOn=:passwordupdatedon WHERE AdminId = :adminid";
+                , PasswordUpdatedOn=:passwordupdatedon, RandomString='' WHERE AdminId = :adminid";
                 //echo $query;
                 $stmt = $this->conn->prepare($query);
                 $stmt->bindparam(':newpassword',$newpassword);
@@ -296,9 +300,9 @@ class SuperAdmin {
 
     function AdminImageUpdate(){
 
-        $query = "UPDATE " . $this->table_name . "SET AdminImage=:Adminimage WHERE AdminId=:adminid";
+        $query = "UPDATE " . $this->table_name . " SET AdminImage=:Adminimage WHERE AdminId=:adminid";
      
-        echo $query;
+        //echo $query;
         // prepare query
         $stmt = $this->conn->prepare($query);
      
@@ -307,6 +311,7 @@ class SuperAdmin {
         
         // bind values
         $stmt->bindParam(":Adminimage", $this->AdminImage);
+        $stmt->bindParam(":adminid", $this->id);
         
      
         // execute query
@@ -317,6 +322,7 @@ class SuperAdmin {
         return false;
 
     }
+
 
     
 }

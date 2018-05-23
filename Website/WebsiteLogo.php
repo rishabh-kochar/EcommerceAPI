@@ -1,9 +1,9 @@
 <?php
 
 include_once '../config/database.php';
-include_once 'SuperAdmin.php';
+include_once './Website.php';
 
-$target_dir = "../Assets/AdminImages/"; 
+$target_dir = "../Assets/WebsiteLogo/";
 if (!is_dir($target_dir)) {
     mkdir($target_dir, 0777);
 }
@@ -11,7 +11,7 @@ if (!is_dir($target_dir)) {
 $database = new Database();
 $db = $database->getConnection();
  
-$SuperAdmin = new SuperAdmin($db);
+$Website = new Website($db);
  
 //$data = json_decode(file_get_contents("php://input"));
 
@@ -44,24 +44,28 @@ if(isset($_FILES['image'])){
     
     if(empty($errors)==true){
         
-        $query = "SELECT * FROM tbladmin WHERE AdminId=:adminid";
+        $query = "SELECT * FROM tblwebsite WHERE Id=:id";
         $stmt = $conn->prepare($query);
-        $stmt->bindParam(":adminid",$_POST['AdminId']);
+        $stmt->bindParam(":id",$_POST['Id']);
         $stmt->execute();
         if($stmt->rowcount()>0){
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             extract($row);
-            unlink($target_dir.$AdminImage);
+            if($Logo != "" && file_exists($target_dir.$Logo))
+                unlink($target_dir.$Logo);
         }
 
         // $file_name = "adminImage_" . $_POST['AdminId'] . $ImageExt;
         //$file_name = "adminImage_" . $_POST['AdminId'] . "." . $file_ext;
         //echo $target_dir . $file_name;
         $rand = date('YmdHis');
-       move_uploaded_file($file_tmp , $target_dir . $rand . "_" . $file_name);
-       $SuperAdmin->AdminImage = $rand . "_" . $file_name;
-        $SuperAdmin->id = $_POST['AdminId'];
-       if($SuperAdmin->AdminImageUpdate()){
+        $newFileName = $rand . "_" . $file_name;
+        
+       move_uploaded_file($file_tmp , $target_dir . $newFileName );
+       $Website->Logo = $newFileName;
+        $Website->id = $_POST['Id'];
+        $Website->LogoAlt = $_POST['LogoAlt'];
+       if($Website->Websitelogo()){
             echo '{"key":"true"}';
         }
         else{
@@ -71,7 +75,7 @@ if(isset($_FILES['image'])){
         echo '{ "key" : "false" }';
     }
  }else{
-    echo '{ "key" : "false" }';
+    echo '{ "key" : "fgfalse" }';
  }
  
 
