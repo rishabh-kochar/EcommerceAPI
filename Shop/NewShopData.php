@@ -8,7 +8,7 @@ $db = $database->getConnection();
 
 $Shops = new Shops($db);
 
-$stmt = $Shops->ShopData();
+$stmt = $Shops->NewShopData();
 $num = $stmt->rowCount();
  //echo $num;
 // check if more than 0 record found
@@ -24,30 +24,12 @@ if($num>0){
         $shop_item=array(
             "ShopID" => $ShopID,
             "ShopName" => $ShopName,
-            "Tagline" => $Tagline,
-            "LogoImage" => $LogoImage,
-            "Address" => $Address,
-            "City" => $City,
-            "State" => $State,
             "PhoneNo" => $PhoneNo,
             "Email" => $Email,
-            "Website" => $Website,
             "OwnerName" => $OwnerName,
-            "FacebookLink" => $FacebookLink,
-            "InstagramLink" => $InstagramLink,
-            "TwitterLink" => $TwitterLink,
-            "YoutubeLink" => $YoutubeLink,
-            "LogoAlt" => $LogoAlt,
-            "GSTNo" => $GSTNo,
-            "UserName" => $UserName,
-            "Password" => $Password,
-            "OldPassword" => $OldPassword,
-            "PasswordUpdatedOn" => $PasswordUpdatedOn,
             "IsActive" => $IsActive,
             "CreatedOn" => $CreatedOn,
             "ShopType" => $ShopType,
-            "ApprovedOn" => $ApprovedOn,
-            "IsSessionActive" => $IsSessionActive,
             "IsApproved" => $IsApproved
         );
  
@@ -58,7 +40,7 @@ if($num>0){
 }
  
 else{
-    echo "False";
+    echo "[]";
 }
 
 ?>

@@ -75,7 +75,7 @@ if(isset($_FILES['image'])){
         echo '{ "key" : "false" }';
     }
  }else{
-    echo '{ "key" : "fgfalse" }';
+    echo '{ "key" : "false" }';
  }
  
 

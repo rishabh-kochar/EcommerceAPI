@@ -54,7 +54,8 @@ if($num>0){
             "CreatedOn" => $CreatedOn,
             "ShopType" => $ShopType,
             "ApprovedOn" => $ApprovedOn,
-            "IsSessionActive" => $IsSessionActive
+            "IsSessionActive" => $IsSessionActive,
+            "IsInitialSetup" => $IsInitialSetup
     );
         
     echo json_encode($SuperAdmin_arr);
