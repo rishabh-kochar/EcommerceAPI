@@ -2,7 +2,7 @@
 <?php
 
 include_once '../config/database.php';
-include_once 'SuperAdmin.php';
+include_once './Shops.php';
 
 $database = new Database();
 $db = $database->getConnection();
@@ -28,5 +28,4 @@ if($res == "0"){
 }elseif($res == "3"){
     echo '{ "key" : "oldsame"}';
 }
-
 ?>

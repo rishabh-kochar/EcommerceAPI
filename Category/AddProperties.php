@@ -11,12 +11,15 @@ $Category = new Category($db);
 $data = json_decode(file_get_contents("php://input"));
  
 $id = $data->CategoryID;
+$properties = ($data->Properties);
 
 
-$res = $Category->DeleteCategory($id);
+print_r($properties);
 
-if($res)
-    echo '{"key":"true"}';
-else
-    echo '{"key":"false"}';
+$res = $Category->AddProperties($id,$properties);
+echo $res;
+// if($res)
+//     echo '{"key":"true"}';
+// else
+//     echo '{"key":"false"}';
 ?>

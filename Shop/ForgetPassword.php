@@ -16,11 +16,11 @@ $username = $data->username;
 $res = $Shops->ForgetPassword($username);
 
 if($res == "0"){
-    echo json_encode('{ "key" : "false"}');
+    echo '{ "key" : "false"}';
 }elseif($res == "1"){
-    echo json_encode('{ "key" : "true"}');
+    echo '{ "key" : "true"}';
 }elseif($res == "2"){
-    echo json_encode('{ "key" : "nexist"}');
+    echo '{ "key" : "nexist"}';
 }
 
 ?>

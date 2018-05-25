@@ -23,7 +23,12 @@ $Category->CreatedOn = date('Y-m-d H:i:s');
 $Category->LastUpdatedOn = date('Y-m-d H:i:s');
 $Category->CategoryImage = $_POST['CategoryImage'];
 $Category->CategoryImageAlt = $_POST['CategoryImageAlt'];
-$CategoryImage = $_FILES['image']['name'];
+if(isset($_FILES['image'])){
+    $CategoryImage = $_FILES['image']['name'];
+}else{
+    $CategoryImage = "";
+}
+
 
 if($id == 'new' && $CategoryImage == ''){
     echo '{"key":"Please Upload the logo."}';
@@ -65,35 +70,14 @@ if($CategoryImage != ""){
 
 if($id != "new" && $CategoryImage != "")
 {
-    $query = "SELECT * FROM tblCategory WHERE CategoryID=:id";
-            $stmt = $conn->prepare($query);
-            $stmt->bindParam(":id",$id);
-            $stmt->execute();
-            if($stmt->rowcount()>0){
-                $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                if(file_exists($target_dir.$row['CategoryImage'])){
-                    unlink($target_dir.$CategoryImage);
-                }
-            }
+    if(file_exists($target_dir.$_POST['CategoryImage'])){
+        unlink($target_dir.$_POST['CategoryImage']);
+    }
+            
 }
 
 $res = $Category->AddCategory();
 
-if($res){
-    echo '{"key":"true"}';
-}
-else{
-    echo '{ "key" : "false" }';
-}
+echo $res;
 
- 
-
-        
-        
-        
-
-      
-    
-       
-    
 ?>

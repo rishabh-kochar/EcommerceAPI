@@ -33,7 +33,7 @@ if($res == null){
     //echo $RandomStringTime . "\n";
 
 
-    if($new_time < $RandomStringTime){
+    if($new_time > $RandomStringTime){
         $SuperAdmin_arr=array(
             "key" => "expired",
             "Email" => $Email

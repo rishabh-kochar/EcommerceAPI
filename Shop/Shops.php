@@ -1,6 +1,7 @@
 <?php
 
 include_once '../config/database.php';
+require("../phpmailer/Mailer/PHPMailer_5.2.0/class.PHPMailer.php");
 
 
 class Shops {
@@ -40,84 +41,7 @@ class Shops {
     }
 
     function SignUp(){
-
-
-        $query = "SELECT * FROM tblwebsite WHERE id = 1";
-        $websitestmt = $this->conn->prepare($query);
-        $websitestmt->execute();
-        $websitedata = $websitestmt->fetch(PDO::FETCH_ASSOC);
-        $mail = new PHPMailer();
-
-        // set mailer to use SMTP
-        $mail->IsSMTP();
-
-        // As this email.php script lives on the same server as our email server
-        // we are setting the HOST to localhost
-        $mail->Host = "smtp.gmail.com";  // specify main and backup server
-
-        $mail->SMTPAuth = true;     // turn on SMTP authentication
-        $mail->Port=465;
-        $mail->SMTPSecure = "ssl";
-        // When sending email using PHPMailer, you need to send from a valid email address
-        // In this case, we setup a test email account with the following credentials:
-        // email: send_from_PHPMailer@bradm.inmotiontesting.com
-        // pass: password
-        if(!isset($websitedata['Email']) || !isset($websitedata['Password']))
-            return "0";
-
-        $mail->Username = $websitedata['Email'];  // SMTP username
-        $mail->Password = $websitedata['Password']; // SMTP password
-
-        // $email is the user's email address the specified
-        // on our contact us page. We set this variable at
-        // the top of this page with:
-        // $email = $_REQUEST['email'] ;
-        $mail->From = $websitedata['Email'] ;
-        $mail->FromName = $websitedata['Name'] ;
-
-        // Random String
-        do{
-
-            $randomUsername = $this->randompassword(8);
-            $query = "SELECT * FROM " . $this->table_name . " WHERE Username = '" . $randomUsername . "'";                   //echo $query;
-            $stmt = $this->conn->prepare($query);
-            $stmt->execute();
-
-        }while($stmt->rowcount()>0);
-
-        $randompassword = $this->randompassword(8);
-        // below we want to set the email address we will be sending our email to.
-        $mail->AddAddress($this->Email);
-
-
-        $mail->IsHTML(true);
-
-        $mail->Subject = "Welcome To" . $websitedata['Name'] ;
-        $message = '<h1>Hello ' . $this->OwnerName . ',</h1>';
-        $message .= '<p>Welcome to ' . $websitedata['Name'] . '</p>';
-        $message .= '<p>The Login credential are as follows - </p>';
-        $message .= '<p> Username : <b>' . $randomUsername . '</b> </p>';
-        $message .= '<p> Password : <b>' . $randompassword . '</b> </p>';
-        $message .= '<p><a href="http://localhost:4200/login">Click Here To Login</a></p>';
-
-        
-
-        // $message is the user's message they typed in
-        // on our contact us page. We set this variable at
-        // the top of this page with:
-        // $message = $_REQUEST['message'] ;
-        $mail->Body    = $message;
-        $mail->AltBody = $message;
-
-        if(!$mail->Send())
-        {
-            //echo "Message could not be sent. <p>";
-            //echo "Mailer Error: " . $mail->ErrorInfo;
-            
-            return '{"key":"Error: ' . $mail->ErrorInfo . '"}';
-
-        }else{
-          
+  
             $query = "INSERT INTO " . $this->table_name . "(ShopName,PhoneNo,Email,OwnerName,IsActive,CreatedOn,ShopType,
             UserName,Password)
             values(:ShopName,:PhoneNo,:Email,:OwnerName,:IsActive,:CreatedOn,:ShopType,:Username,:Password); ";
@@ -132,14 +56,14 @@ class Shops {
           
             //echo $this->AdminName;
             //echo $this->phone_no;
-    
+            $IsActive = 0;
             // bind values
             $stmt->bindParam(":ShopName", $this->ShopName);
             $stmt->bindParam(":PhoneNo", $this->PhoneNo);
             $stmt->bindParam(":Email", $this->Email);
             $stmt->bindParam(":OwnerName", $this->OwnerName);
             $stmt->bindParam(":ShopType", $this->ShopType);
-            $stmt->bindParam(":IsActive", 0);
+            $stmt->bindParam(":IsActive", $IsActive);
             $stmt->bindParam(":CreatedOn", $this->CreatedOn);
             $stmt->bindParam(":Username", $randomUsername);
             $stmt->bindParam(":Password", $randompassword);
@@ -148,13 +72,51 @@ class Shops {
             
             // execute query
             if($stmt->execute()){
-                return '{"key":"true"}';
-            }
+
+                $query = "SELECT * FROM tblwebsite WHERE id = 1";
+                $websitestmt = $this->conn->prepare($query);
+                $websitestmt->execute();
+                $websitedata = $websitestmt->fetch(PDO::FETCH_ASSOC);
+                $mail = new PHPMailer();
+
+            
+                $mail->IsSMTP();
+                $mail->Host = "smtp.gmail.com";  
+
+                $mail->SMTPAuth = true;     
+                $mail->Port=465;
+                $mail->SMTPSecure = "ssl";
+                if(!isset($websitedata['Email']) || !isset($websitedata['Password']))
+                    return '{"key":"fasle"}';
+
+                $mail->Username = $websitedata['Email'];  
+                $mail->Password = $websitedata['Password']; 
+
+            
+                $mail->From = $websitedata['Email'] ;
+                $mail->FromName = $websitedata['Name'] ;
+
         
+                $mail->AddAddress($this->Email);
+
+
+                $mail->IsHTML(true);
+
+                $mail->Subject = "Welcome To" . $websitedata['Name'] ;
+                $message = '<h1>Hello ' . $this->OwnerName . ',</h1>';
+                $message .= '<p>Welcome to ' . $websitedata['Name'] . '. Your requested has been forwarded to the Administrator. 
+                                You will Receive Response in Very short time.</p>';
+                
+
+                $mail->Body    = $message;
+                $mail->AltBody = $message;
+
+                if(!$mail->Send())
+                    return '{"key":"Error: ' . $mail->ErrorInfo . '"}';
+                return '{"key":"true"}';
+                
+            }
             return '{"key":"false"}';
-        }
-
-
     }
 
     function randompassword( $length ) {
@@ -214,18 +176,100 @@ class Shops {
         extract($row);
 
         if($IsMember == 0){
-            $query = "UPDATE " . $this->table_name . " SET IsApproved=:status, IsMember=:status WHERE ShopID=:id;";
+            
+
+            $query = "SELECT * FROM tblwebsite WHERE id = 1";
+            $websitestmt = $this->conn->prepare($query);
+            $websitestmt->execute();
+            $websitedata = $websitestmt->fetch(PDO::FETCH_ASSOC);
+            $mail = new PHPMailer();
+
+            // set mailer to use SMTP
+            $mail->IsSMTP();
+
+            // As this email.php script lives on the same server as our email server
+            // we are setting the HOST to localhost
+            $mail->Host = "smtp.gmail.com";  // specify main and backup server
+
+            $mail->SMTPAuth = true;     // turn on SMTP authentication
+            $mail->Port=465;
+            $mail->SMTPSecure = "ssl";
+            // When sending email using PHPMailer, you need to send from a valid email address
+            // In this case, we setup a test email account with the following credentials:
+            // email: send_from_PHPMailer@bradm.inmotiontesting.com
+            // pass: password
+            if(!isset($websitedata['Email']) || !isset($websitedata['Password']))
+                return "0";
+
+            $mail->Username = $websitedata['Email'];  // SMTP username
+            $mail->Password = $websitedata['Password']; // SMTP password
+
+            // $email is the user's email address the specified
+            // on our contact us page. We set this variable at
+            // the top of this page with:
+            // $email = $_REQUEST['email'] ;
+            $mail->From = $websitedata['Email'] ;
+            $mail->FromName = $websitedata['Name'] ;
+
+            // Random String
+            do{
+
+                $randomUsername = $this->randompassword(8);
+                $query = "SELECT * FROM " . $this->table_name . " WHERE Username = '" . $randomUsername . "'";                   //echo $query;
+                $stmt = $this->conn->prepare($query);
+                $stmt->execute();
+
+            }while($stmt->rowcount()>0);
+
+            $randompassword = $this->randompassword(8);
+            // below we want to set the email address we will be sending our email to.
+            $mail->AddAddress($Email);
+
+
+            $mail->IsHTML(true);
+
+            $mail->Subject = "Welcome To" . $websitedata['Name'] ;
+            $message = '<h1>Hello ' . $this->OwnerName . ',</h1>';
+            $message .= '<p>Welcome to ' . $websitedata['Name'] . '</p>';
+            $message .= '<p>The Login credential are as follows - </p>';
+            $message .= '<p> Username : <b>' . $randomUsername . '</b> </p>';
+            $message .= '<p> Password : <b>' . $randompassword . '</b> </p>';
+            $message .= '<p><a href="http://localhost:4200/login">Click Here To Login</a></p>';
+
+            
+
+            // $message is the user's message they typed in
+            // on our contact us page. We set this variable at
+            // the top of this page with:
+            // $message = $_REQUEST['message'] ;
+            $mail->Body    = $message;
+            $mail->AltBody = $message;
+
+            if(!$mail->Send())
+            {
+                return '{"key":"Error: ' . $mail->ErrorInfo . '"}';
+
+            }else{
+                $query = "UPDATE " . $this->table_name . " SET IsApproved=:status, IsMember=:status, UserName=:UserName, Password=:Password WHERE ShopID=:id;";
+                $stmt = $this->conn->prepare($query);
+                $stmt->bindparam(":UserName",$randomUsername);
+                $stmt->bindparam(":Password",$randompassword);
+            }
+
+
         }else{
             $query = "UPDATE " . $this->table_name . " SET IsApproved=:status WHERE ShopID=:id;";
+            $stmt = $this->conn->prepare($query);
         }
 
         //echo $query;
-        $stmt = $this->conn->prepare($query);
+       
         $stmt->bindparam(":id",$id);
         $stmt->bindparam(":status",$status);
+        
         if( $stmt->execute())
-            return true;
-        return false;
+            return '{"key":"true"}';
+        return '{"key":"false"}';
     }
 
     function DeleteShop($id){
@@ -240,7 +284,9 @@ class Shops {
 
     function CheckLogin($username,$password){
 
-        $query = "SELECT * FROM " . $this->table_name . " WHERE UserName = '" . $username . "' AND Password = '" . $password . "'";
+        $query = "SELECT * FROM " . $this->table_name . " WHERE UserName = '" . $username . "' OR Email = '" . $username . "'
+                    OR PhoneNo = '" . $username ."' AND Password = '" . $password . "'
+                    AND IsApproved = 1";
 
          //echo $query;
         $stmt = $this->conn->prepare($query);
@@ -248,7 +294,7 @@ class Shops {
         
         $num = $stmt->rowcount();
         if($num>0){
-            $query = "UPDATE " . $this->table_name . " SET IsSessionActive = 1 WHERE UserName = '" . $username . "' OR PhoneNo = '" . $username . "'";
+            $query = "UPDATE " . $this->table_name . " SET IsSessionActive = 1 WHERE UserName = '" . $username . "'";
             //echo $query;
             $stmtupdate = $this->conn->prepare($query);
             if(!$stmtupdate->execute()){
@@ -300,15 +346,15 @@ class Shops {
 
     function ForgetPassword($username){
 
-        $query = "SELECT * FROM " . $this->table_name . " WHERE UserName = '" . $username . "'"; 
+        $query = "SELECT * FROM " . $this->table_name . " WHERE UserName = '" . $username . "' OR 
+                    Email = '" . $username. "' OR PhoneNo = '" . $username. "'"; 
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         
-
        
         
-        if($username == $row['Username'] ){
+        if($username == $row['UserName'] || $username == $row['Email'] || $username == $row['PhoneNo'] ){
 
 
                 $query = "SELECT * FROM tblwebsite WHERE id = 1";
@@ -353,7 +399,7 @@ class Shops {
 
 
                 // below we want to set the email address we will be sending our email to.
-                $mail->AddAddress($Email);
+                $mail->AddAddress($row['Email']);
 
 
                 $mail->IsHTML(true);
@@ -398,10 +444,13 @@ class Shops {
     function ResetPassword($newpassword,$username,$verificationcode){
 
         $query = "SELECT * FROM " . $this->table_name . " WHERE Username = '" . $username . 
-                 "' AND VerificationCode = '" . $verificationcode . "'"; 
+                 "' OR Email = '" . $username . "' OR 
+                 PhoneNo = '" . $username . "' AND VerificationCode = '" . $verificationcode . "'"; 
+        //echo $query;
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
 
+        
         $num = $stmt->rowcount();
         if($num>0){
 
@@ -458,8 +507,4 @@ class Shops {
 
     
 }
-
-
-
-
 ?>
