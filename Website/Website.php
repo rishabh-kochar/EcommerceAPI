@@ -55,7 +55,7 @@ class Website {
         }
        
      
-        echo $query;
+        //echo $query;
         // prepare query
         $stmt = $this->conn->prepare($query);
      

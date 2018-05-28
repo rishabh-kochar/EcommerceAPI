@@ -1,17 +1,18 @@
 <?php
 include_once '../config/database.php';
-include_once 'SuperAdmin.php';
+include_once './Shops.php';
 
 $database = new Database();
 $db = $database->getConnection();
  
-$SuperAdmin = new SuperAdmin($db);
+$Shops = new Shops($db);
 //$SuperAdmin->ReadInfo();
 
 $data = json_decode(file_get_contents("php://input"));
 
 $rand = $data->rand;
-$res = $SuperAdmin->RandomString($rand);
+
+$res = $Shops->RandomString($rand);
 if($res == null){
 
     echo '{"key":"false"}';

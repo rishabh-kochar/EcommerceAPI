@@ -13,7 +13,7 @@ $data = json_decode(file_get_contents("php://input"));
 $id = $data->ShopID;
 $status = $data->Status;
 
-$res = $Shops->SetShopStatus($id,$status); 
+$res = $Shops->SetShopApprovedStatus($id,$status); 
 if($res) {
     echo '{ "key" : "true"}';
 }else{
