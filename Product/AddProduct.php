@@ -1,9 +1,9 @@
 <?php
 
 include_once '../config/database.php';
-include_once './Category.php';
+include_once './Product.php';
 
-$target_dir = "../Assets/CategoryImages/";
+$target_dir = "../Assets/ProductImages/";
 if (!is_dir($target_dir)) {
     mkdir($target_dir, 0777);
 }
@@ -11,26 +11,29 @@ if (!is_dir($target_dir)) {
 $database = new Database();
 $db = $database->getConnection();
  
-$Category = new Category($db);
+$Product = new Product($db);
 
-$id = $_POST['CategoryID'];
+$id = $_POST['ProductID'];
 $Category->CategoryID = $id;
-$Category->CategoryName = $_POST['CategoryName'];
-$Category->CategoryDesc = $_POST['CategoryDesc'];
-$Category->ShopID = $_POST['ShopID'];
+$Category->CategoryName = $_POST['ProductName'];
+$Category->CategoryDesc = $_POST['ProductDesc'];
+$Category->ShopID = $_POST['CategoryID'];
 $Category->IsActive = 1;
+$Category->IsApproved = 1;
 $Category->CreatedOn = date('Y-m-d H:i:s');
 $Category->LastUpdatedOn = date('Y-m-d H:i:s');
-$Category->CategoryImage = $_POST['CategoryImage'];
-$Category->CategoryImageAlt = $_POST['CategoryImageAlt'];
+$Category->CategoryImage = $_POST['ProductImage1'];
+
 if(isset($_FILES['image'])){
     $CategoryImage = $_FILES['image']['name'];
 }else{
     $CategoryImage = "";
 }
 
-//echo $CategoryImage;
-//echo $Category->CategoryImage;
+
+if($id == 'new' && $CategoryImage == ''){
+    echo '{"key":"Please Upload the logo."}';
+}
 
  
 $conn = $db;
@@ -65,10 +68,6 @@ if($CategoryImage != ""){
         }
     
 }
-
-
-//echo $CategoryImage;
-//echo $Category->CategoryImage;
 
 if($id != "new" && $CategoryImage != "")
 {

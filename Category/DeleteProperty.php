@@ -10,16 +10,10 @@ $Category = new Category($db);
  
 $data = json_decode(file_get_contents("php://input"));
  
-$id = $data->CategoryID;
-$property = ($data->Property);
+$id = $data->ID;
+$Categoryid = $data->CID;
 
 
-//print_r($property);
+$res = $Category->DeleteProperty($id,$Categoryid);
 
-$res = $Category->AddProperties($id,$property);
-echo $res;
-// if($res)
-//     echo '{"key":"true"}';
-// else
-//     echo '{"key":"false"}';
 ?>

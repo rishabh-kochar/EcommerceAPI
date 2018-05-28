@@ -25,6 +25,10 @@ if($num>0){
         
         extract($row);
  
+        if($IsFilter == 0)
+            $IsFilter = "No";
+        else
+            $IsFilter = "Yes";
         $shop_item=array(
             "ID" => $CategoryPropertyID,
             "PropertyName" => $PropertyName,
