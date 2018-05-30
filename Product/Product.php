@@ -8,6 +8,7 @@ class Product {
     // database connection and table name
     private $conn;
     private $table_name = "tblproduct";
+    private $target_dir = "../Assets/ProductImages/";
  
     // object properties
     public $PoductID;
@@ -158,6 +159,21 @@ class Product {
     }
 
     function DeleteImage($id){
+
+        $query = "SELECT * FROM tblproductimage WHERE id=:id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":id", $id);
+        $stmt->execute();
+        if($stmt->rowcount()>0){
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            if(file_exists($this->target_dir . $row['Image'])){
+                //fclose($this->target_dir);
+                unlink($this->target_dir . $row['Image']);
+            }
+                
+        }
+       
+
         $query = "DELETE FROM tblproductimage WHERE id=:id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":id", $id);
@@ -165,6 +181,27 @@ class Product {
             return true;
         else
             return false;
+    }
+
+    function AllProduct(){
+        $query = "SELECT *,p.IsApproved ProductApproved FROM " . $this->table_name . " p
+                    LEFT JOIN tblCategory as c on p.CategoryID = c.CategoryID
+                    LEFT JOIN tblShops as s on c.ShopID = s.ShopID
+                    ORDER BY ProductId";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt;
+    }
+
+    function DisableProduct($id,$status){
+        $query = "UPDATE " . $this->table_name . " SET IsApproved=:status WHERE ProductId=:ProductId";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":ProductId", $id);
+        $stmt->bindParam(":status", $status);
+        if($stmt->execute()){
+            return true;
+        }
+        return false;   
     }
 
 

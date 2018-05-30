@@ -43,7 +43,8 @@ class Feedback {
     }
 
     function GetFeedback(){
-        $query = "SELECT * FROM " . $this->table_name . " WHERE Response='' ORDER BY FeedbackID DESC";
+        $query = "SELECT * FROM " . $this->table_name . " WHERE Response IS NULL ORDER BY FeedbackID DESC";
+        //echo $query;
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt;
@@ -57,7 +58,7 @@ class Feedback {
         $stmt->execute();
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         extract($row);
-        if($mail->sendMail($Email,$this->subject,$this->Response)){
+        if($mail->send($Email,$this->subject,$this->Response)){
             $query = "UPDATE " . $this->table_name . " SET Response=:Response, RepliedOn=:RepliedOn WHERE FeedbackID=:id";
             $stmt = $this->conn->prepare($query);
             $stmt->bindparam(":id",$this->FeedbackID);

@@ -27,7 +27,7 @@ if($num>0){
           "Email" => $Email,
           "Type" => $Type,
           "Feedback" => $Feedback,
-          "CreatedOn" => $crestedOn  
+          "CreatedOn" => $CreatedOn
         );
  
         array_push($shop_arr["records"], $shop_item);
