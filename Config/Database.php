@@ -6,6 +6,8 @@ header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: content-type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 date_default_timezone_set('Asia/Calcutta'); 
+error_reporting(E_ALL);
+ini_set('display_errors','1');
 
 class Database{
  
@@ -24,6 +26,7 @@ class Database{
         try{
             $this->conn = new PDO("mysql:host=" . $this->host . ";dbname=" . $this->db_name, $this->username, $this->password);
             $this->conn->exec("set names utf8");
+            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             //echo "Connection Succesful";
         }catch(PDOException $exception){
             echo "Connection error: " . $exception->getMessage();
