@@ -85,7 +85,7 @@ class Category {
     }
 
     function CategoryData($id){
-        $query = "SELECT * FROM " . $this->table_name . " WHERE IsActive=1 AND ShopID=:id ORDER BY CategoryID Desc;";
+        $query = "SELECT * FROM " . $this->table_name . " WHERE IsActive=1 AND IsApproved=1 AND ShopID=:id ORDER BY CategoryID Desc;";
         $stmt = $this->conn->prepare($query);
         $stmt->bindparam(":id",$id);
         $stmt->execute();
@@ -94,7 +94,7 @@ class Category {
     }
 
     function SingleCategoryData($Categoryid){
-        $query = "SELECT * FROM " . $this->table_name . " WHERE IsActive=1 AND CategoryId=:id;";
+        $query = "SELECT * FROM " . $this->table_name . " WHERE IsActive=1 AND IsApproved=1 AND CategoryId=:id;";
         $stmt = $this->conn->prepare($query);
         $stmt->bindparam(":id",$Categoryid);
         $stmt->execute();
@@ -251,6 +251,26 @@ class Category {
             echo '{"key":"false"}';
         }
         
+    }
+
+    function DisableCategory($id,$status){
+        $query = "UPDATE " . $this->table_name . " SET IsApproved=:status WHERE CategoryID=:CategoryID";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":CategoryID", $id);
+        $stmt->bindParam(":status", $status);
+        if($stmt->execute()){
+            return true;
+        }
+        return false;
+    }
+
+    function AllCategory(){
+        $query= "SELECT *,c.IsApproved CategoryApproved FROM tblcategory c
+                    LEFT JOIN tblshops as s on c.ShopID = s.ShopID
+                    ORDER BY c.CategoryID";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt;
     }
 
     

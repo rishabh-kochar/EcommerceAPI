@@ -4,9 +4,9 @@ include_once '../config/database.php';
 require("../phpmailer/Mailer/PHPMailer_5.2.0/class.PHPMailer.php");
 
 
-class Mail {
+class SendMail {
 
-    function sendMail($mailto,$subject,$message){
+    function send($mailto,$subject,$message){
 
 
         $database = new Database();

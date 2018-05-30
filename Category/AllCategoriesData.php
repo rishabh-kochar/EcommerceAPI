@@ -8,17 +8,22 @@ $db = $database->getConnection();
 
 $Category = new Category($db);
 
-$id = $_GET['id'];
-$stmt = $Category->SingleCategoryData($id);
+//$data = json_decode(file_get_contents("php://input"));
+
+$stmt = $Category->AllCategory();
 $num = $stmt->rowCount();
  //echo $num;
 // check if more than 0 record found
 if($num>0){
  
     $shop_arr=array();
-    $row = $stmt->fetch(PDO::FETCH_ASSOC);
-    extract($row);
-        $shop_arr=array(
+    $shop_arr["records"]=array();
+ 
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)){
+        
+        extract($row);
+ 
+        $shop_item=array(
             "CategoryID" => $CategoryId,
             "CategoryName" => $CategoryName,
             "CategoryDesc" => $CategoryDesc,
@@ -28,32 +33,19 @@ if($num>0){
             "IsActive" => $IsActive,
             "CreatedOn" => $CreatedOn,
             "LastUpdatedOn" => $LastUpdatedOn,
-            "IsApproved" => $IsApproved
+            "ShopName" => $ShopName,
+            "IsApproved" => $CategoryApproved
 
         );
  
-       
+        array_push($shop_arr["records"], $shop_item);
+    }
  
     echo json_encode($shop_arr);
 }
  
 else{
-    $shop_arr=array();
-    $row = $stmt->fetch(PDO::FETCH_ASSOC);
-    extract($row);
-        $shop_arr=array(
-            "CategoryID" => "",
-            "CategoryName" => "",
-            "CategoryDesc" => "",
-            "CategoryImage" => "",
-            "CategoryImageAlt" => "",
-            "ShopID" => "",
-            "IsActive" => "",
-            "CreatedOn" => "",
-            "LastUpdatedOn" => ""
-
-        );
-    echo json_encode($shop_arr);
+    echo '{"key":"false"}';
 }
 
 ?>

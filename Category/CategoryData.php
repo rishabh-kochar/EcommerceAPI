@@ -34,7 +34,8 @@ if($num>0){
             "ShopID" => $ShopID,
             "IsActive" => $IsActive,
             "CreatedOn" => $CreatedOn,
-            "LastUpdatedOn" => $LastUpdatedOn
+            "LastUpdatedOn" => $LastUpdatedOn,
+            "IsApproved" => $IsApproved
 
         );
  
