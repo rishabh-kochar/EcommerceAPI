@@ -206,8 +206,4 @@ class Product {
 
 
 }
-
-
-
-
 ?>

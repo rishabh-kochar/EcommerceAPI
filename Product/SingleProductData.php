@@ -37,6 +37,10 @@ if($num>0){
             array_push($image_arr, $image_item);
         }
 
+        if($IsActive == 1)
+            $IsActive = "Yes";
+        else
+            $IsActive = "No";
         $shop_arr=array(
             "ProductID" => $ProductId,
             "CategoryID" => $CategoryId,

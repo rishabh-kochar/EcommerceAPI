@@ -1,7 +1,7 @@
 <?php
 
 include_once '../config/database.php';
-include_once '../Mail/Mail.php';
+include_once '../phpmailer/Mailer/Mail.php';
 
 
 class Feedback {
@@ -43,14 +43,16 @@ class Feedback {
     }
 
     function GetFeedback(){
-        $query = "SELECT * FROM " . $this->table_name . " WHERE Response IS NULL ORDER BY FeedbackID DESC";
+        $query = "SELECT * FROM " . $this->table_name . " ORDER BY FeedbackID DESC";
         //echo $query;
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt;
     }
 
+
     function Reply(){
+
         $mail = new SendMail();
         $query = "SELECT * FROM tblfeedback WHERE FeedbackID=:id";
         $stmt = $this->conn->prepare($query);

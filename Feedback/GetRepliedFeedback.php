@@ -8,7 +8,7 @@ $db = $database->getConnection();
  
 $Feedback = new Feedback($db);
 
-$stmt = $Feedback->GetFeedback();
+$stmt = $Feedback->GetRepliedFeedback();
 $num = $stmt->rowCount();
  //echo $num;
 // check if more than 0 record found
@@ -28,7 +28,7 @@ if($num>0){
           "Type" => $Type,
           "Feedback" => $Feedback,
           "CreatedOn" => $CreatedOn,
-          "Reply" => $Response,
+          "Reply" => $Reply,
           "RepliedOn" => $RepliedOn
         );
  

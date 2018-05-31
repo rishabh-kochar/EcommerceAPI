@@ -46,7 +46,8 @@ if($num>0){
         "ShopType" => $ShopType,
         "ApprovedOn" => $ApprovedOn,
         "IsSessionActive" => $IsSessionActive,
-        "IsApproved" => $IsApproved
+        "IsApproved" => $IsApproved,
+        "Pincode" => $Pincode
     );
 
     echo json_encode($shop_arr);

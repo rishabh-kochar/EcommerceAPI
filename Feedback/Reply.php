@@ -9,9 +9,9 @@ $db = $database->getConnection();
 $Feedback = new Feedback($db);
 
 $data = json_decode(file_get_contents("php://input"));
-$Feedback->FeedbackID = $data->FeedbackID;
-$Feedback->Response = $data->Response;
-$Feedback->subject = $data->subject;
+$Feedback->FeedbackID = $data->Id;
+$Feedback->Response = $data->Reply;
+$Feedback->subject = $data->Subject;
 $Feedback->RepliedOn =  date('Y-m-d H:i:s');
 
 $res = $Feedback->Reply();
