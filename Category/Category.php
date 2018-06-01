@@ -26,6 +26,7 @@ class Category {
     public $PropertyDesc;
     public $IsFilter;
     public $ColumnOrder;
+    public $value;
 
     // constructor with $db as database connection
     public function __construct($db){
@@ -271,6 +272,114 @@ class Category {
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt;
+    }
+
+    function GetProperties($id,$pid){
+        $query = "SELECT * FROM tblcategoryproperties WHERE CategoryID=:id ORDER BY ColumnOrder";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindparam(":id",$id);
+        $stmt->execute();
+        
+        $num = $stmt->rowCount();
+        //echo $num;
+        // check if more than 0 record found
+        $flag = 0;
+        if($num>0){
+               
+                $shop_arr=array();
+                $shop_arr["records"]=array();
+                
+                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)){
+                   
+                    extract($row);
+
+                    if($flag == 0){
+                        $query = "SELECT * FROM tblcategorypropertiesvalues WHERE ProductID=:pid AND CategoryPropertyID=:cid";
+                        $stmtvalue = $this->conn->prepare($query);
+                        $stmtvalue->bindparam(":pid",$pid);
+                        $stmtvalue->bindparam(":cid",$CategoryPropertyID);
+                        $stmtvalue->execute();
+
+                        if($stmtvalue->rowcount()>0){
+                            $rowvalue = $stmtvalue->fetch(PDO::FETCH_ASSOC);
+                            $value = $rowvalue['Value'];
+                        }else{
+                            $flag=1;
+                            $value = "";
+                        }
+                    }
+                    
+                    $PropertyWithoutSpace = str_replace(' ', '', $PropertyName);
+                    $shop_item=array(
+                        "CategoryPropertyId" => $CategoryPropertyID,
+                        "PropertyName" => $PropertyName,
+                        "ID" => $PropertyWithoutSpace,
+                        "Value" => $value
+                    );
+            
+                    array_push($shop_arr["records"], $shop_item);
+                }
+                
+                if($flag == 1)
+                    $shop_arr["operation"] = "new";
+                else
+                    $shop_arr["operation"] = "update";
+
+                return json_encode($shop_arr);
+            
+        
+            
+        }else{
+            return false;
+        }
+
+        
+
+    }
+
+    function AddPropertyValue($operation,$id,$property){
+
+        $this->ProductID = $id;
+        $size = sizeof($property);
+        //echo $size;
+        if($operation == "new"){
+                $j=0;
+                for($i=0;$i<$size;$i++){
+                    $this->CategoryPropertyID = $property[$i]->ID;
+                    $this->value = $property[$i]->Value;
+                    $query = "INSERT INTO tblcategorypropertiesvalues(ProductID,CategoryPropertyID,Value) 
+                                values(:ProductID,:CategoryPropertyID,:Value)";
+                    $stmt = $this->conn->prepare($query);
+                    $stmt->bindparam(":ProductID",$this->ProductID);
+                    $stmt->bindparam(":CategoryPropertyID",$this->CategoryPropertyID);
+                    $stmt->bindparam(":Value",$this->value);
+                    if(!$stmt->execute())
+                        $j=1;
+                }
+                
+                if($j==0)
+                    return true;
+                return false;
+        } else{
+                 $j=0;
+                for($i=0;$i<$size;$i++){
+                    $this->CategoryPropertyID = $property[$i]->ID;
+                    $this->value = $property[$i]->Value;
+                    $query = "UPDATE tblcategorypropertiesvalues SET Value=:Value 
+                                WHERE ProductID=:ProductID AND CategoryPropertyID=:CategoryPropertyID";
+                    $stmt = $this->conn->prepare($query);
+                    $stmt->bindparam(":ProductID",$this->ProductID);
+                    $stmt->bindparam(":CategoryPropertyID",$this->CategoryPropertyID);
+                    $stmt->bindparam(":Value",$this->value);
+                    if(!$stmt->execute())
+                        $j=1;
+                }
+                
+                if($j==0)
+                    return true;
+                return false;
+        }
+            
     }
 
     

@@ -1,14 +1,16 @@
 <?php
 
 include_once '../config/database.php';
-include_once './Feedback.php';
+include_once './Tracking.php';
 
 $database = new Database();
 $db = $database->getConnection();
  
-$Feedback = new Feedback($db);
+$Tracking = new Tracking($db);
+//$id = $_GET['id'];
+$id = 4;
 
-$stmt = $Feedback->GetFeedback();
+$stmt = $Tracking->ViewTracking($id);
 $num = $stmt->rowCount();
  //echo $num;
 // check if more than 0 record found
@@ -22,14 +24,12 @@ if($num>0){
         extract($row);
  
         $shop_item=array(
-          "FeedbackID" => $FeedbackID,
-          "Name" => $Name,
-          "Email" => $Email,
-          "Type" => $Type,
-          "Feedback" => $Feedback,
-          "CreatedOn" => $CreatedOn,
-          "Reply" => $Response,
-          "RepliedOn" => $RepliedOn
+          "TrackingID" => $TrackingID,
+          "Text" => $TrackingText,
+          "ArrivedTime" => $ArrivedTime,
+          "DispatchedTime" => $DispatchedTime,
+          "Status" => $Status
+
         );
  
         array_push($shop_arr["records"], $shop_item);

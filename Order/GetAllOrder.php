@@ -1,14 +1,14 @@
 <?php
 
 include_once '../config/database.php';
-include_once './Feedback.php';
+include_once './Orders.php';
 
 $database = new Database();
 $db = $database->getConnection();
  
-$Feedback = new Feedback($db);
+$Order = new Order($db);
 
-$stmt = $Feedback->GetFeedback();
+$stmt = $Order->Allorder();
 $num = $stmt->rowCount();
  //echo $num;
 // check if more than 0 record found
@@ -22,14 +22,18 @@ if($num>0){
         extract($row);
  
         $shop_item=array(
-          "FeedbackID" => $FeedbackID,
-          "Name" => $Name,
-          "Email" => $Email,
-          "Type" => $Type,
-          "Feedback" => $Feedback,
-          "CreatedOn" => $CreatedOn,
-          "Reply" => $Response,
-          "RepliedOn" => $RepliedOn
+            "OrderID" => $OrderID,
+          "ProductName" => $ProductName,
+          "Qty" => $Qty,
+          "Price" => $Price,
+          "PhoneNo" => $PhoneNo,
+          "City" => $City,
+          "Status" => $Status,
+          "ProductID" => $PID,
+          "OrderDetailID" => $OrderDetailID,
+          "CustomerID" => $CID,
+          "ShopName" => $ShopName
+
         );
  
         array_push($shop_arr["records"], $shop_item);

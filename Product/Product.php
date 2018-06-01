@@ -104,6 +104,8 @@ class Product {
         $query = "SELECT * FROM tblproduct p
                     LEFT JOIN tblCategory as c on p.CategoryID = c.CategoryID
                     LEFT JOIN tblShops as s on c.ShopID = s.ShopID
+                    LEFT JOIN tblcategoryProperties as cp on c.CategoryID = c.CategoryID
+                    LEFT JOIN tblcategoryPropertiesvalues as cpv on cp.CategoryPropertyID = cpv.CategoryPropertyID
                     WHERE p.IsApproved=1 and p.ProductID=:id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindparam(":id",$id);
@@ -206,8 +208,4 @@ class Product {
 
 
 }
-
-
-
-
 ?>

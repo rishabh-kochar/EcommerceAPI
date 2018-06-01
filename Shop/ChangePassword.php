@@ -17,7 +17,7 @@ $oldpassword = $data->oldpassword;
 // $AdminId = 1;
 // $Password = "store";
 
-$stmt = $SuperAdmin->ChangePassword($AdminId,$Password,$oldpassword);
+$stmt = $Shops->ChangePassword($Id,$Password,$oldpassword);
 
 echo $stmt;
 

@@ -19,6 +19,7 @@ class Shops {
     public $Address;
     public $City;
     public $State;
+    public $Pincode;
     public $PhoneNo;
     public $Email;
     public $Website;
@@ -310,12 +311,12 @@ class Shops {
 
     function ChangePassword($Id,$newpassword, $oldsendPassword){
 
-        $query = "SELECT * FROM " . $this->table_name . " WHERE ShopID = " . $ID;
+        $query = "SELECT * FROM " . $this->table_name . " WHERE ShopID = " . $Id;
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         extract($row);
-
+        $time = date('Y-m-d H:i:s');
         if($oldsendPassword == $Password){
             if ($Password == $newpassword ){
                 return '{ "key" : "same" }';
@@ -329,7 +330,7 @@ class Shops {
                 $stmt->bindparam(':newpassword',$newpassword);
                 $stmt->bindparam(':password',$Password);
                 $stmt->bindparam(':adminid',$Id);
-                $stmt->bindparam(':passwordupdatedon',date('Y-m-d H:i:s'));
+                $stmt->bindparam(':passwordupdatedon',$time);
                 $stmt->execute();
                 
                 if($stmt->rowcount() > 0) {
@@ -502,6 +503,136 @@ class Shops {
         //echo $query;
         $stmt->execute();
         return $stmt;
+    }
+
+    function UpdateShopInfo(){
+        $query = "UPDATE " . $this->table_name . " SET ShopName=:ShopName, ShopType=:ShopType,
+                    PhoneNo=:PhoneNo, Email=:Email, Address=:Address, City=:City, State=:State,
+                    Pincode=:Pincode  WHERE ShopID=:id";
+        $stmt = $this->conn->prepare($query);
+
+                    // sanitize
+        $this->ShopName=htmlspecialchars(strip_tags($this->ShopName));
+        $this->PhoneNo=htmlspecialchars(strip_tags($this->PhoneNo));
+        $this->Email=htmlspecialchars(strip_tags($this->Email));
+        $this->Address=htmlspecialchars(strip_tags($this->Address));
+        $this->ShopType=htmlspecialchars(strip_tags($this->ShopType));
+        $this->City=htmlspecialchars(strip_tags($this->City));
+        $this->State=htmlspecialchars(strip_tags($this->State));
+        $this->Pincode=htmlspecialchars(strip_tags($this->Pincode));
+
+        $stmt->bindParam(":ShopName", $this->ShopName);
+        $stmt->bindParam(":PhoneNo", $this->PhoneNo);
+        $stmt->bindParam(":Email", $this->Email);
+        $stmt->bindParam(":Address", $this->Address);
+        $stmt->bindParam(":City", $this->City);
+        $stmt->bindParam(":ShopType", $this->ShopType);
+        $stmt->bindParam(":State", $this->State);
+        $stmt->bindParam(":Pincode", $this->Pincode);
+        $stmt->bindparam(":id", $this->ShopID);
+
+        if($stmt->execute())
+            return true;
+        return false;
+        
+    }
+
+    function UpdateBusinessDetails(){
+        $query = "UPDATE " . $this->table_name . " SET GSTNo=:GSTNo, LogoImage=:LogoImage,
+                    LogoAlt=:LogoAlt, Tagline=:Tagline WHERE ShopID=:id";
+        
+                    $stmt = $this->conn->prepare($query);
+
+                    // sanitize
+        $this->GSTNo=htmlspecialchars(strip_tags($this->GSTNo));
+        $this->LogoImage=htmlspecialchars(strip_tags($this->LogoImage));
+        $this->LogoAlt=htmlspecialchars(strip_tags($this->LogoAlt));
+        $this->Tagline=htmlspecialchars(strip_tags($this->Tagline));
+
+        $stmt->bindParam(":GSTNo", $this->GSTNo);
+        $stmt->bindParam(":LogoImage", $this->LogoImage);
+        $stmt->bindParam(":LogoAlt", $this->LogoAlt);
+        $stmt->bindParam(":Tagline", $this->Tagline);
+        $stmt->bindparam(":id", $this->ShopID);
+
+        if($stmt->execute())
+            return true;
+        return false;
+    }
+
+    function UpdateSocialLinks(){
+        $query = "UPDATE " . $this->table_name . " SET FacebookLink=:FacebookLink, YoutubeLink=:YoutubeLink,
+        TwitterLink=:TwitterLink, InstagramLink=:InstagramLink WHERE ShopID=:id";
+
+        $stmt = $this->conn->prepare($query);
+
+        $this->FacebookLink=htmlspecialchars(strip_tags($this->FacebookLink));
+        $this->YoutubeLink=htmlspecialchars(strip_tags($this->YoutubeLink));
+        $this->TwitterLink=htmlspecialchars(strip_tags($this->TwitterLink));
+        $this->InstagramLink=htmlspecialchars(strip_tags($this->InstagramLink));
+
+        $stmt->bindParam(":FacebookLink", $this->FacebookLink);
+        $stmt->bindParam(":YoutubeLink", $this->YoutubeLink);
+        $stmt->bindParam(":TwitterLink", $this->TwitterLink);
+        $stmt->bindParam(":InstagramLink", $this->InstagramLink);
+        $stmt->bindparam(":id", $this->ShopID);
+        if($stmt->execute())
+            return true;
+        return false;
+    }
+
+    function InitialSetup(){
+        $query = "UPDATE " . $this->table_name . " SET Username=:Username, Password=:Password, IsInitialSetup=1 WHERE ShopID=:id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindparam(":Username",$this->Username);
+        $stmt->bindparam(":Password",$this->Password);
+        $stmt->bindparam(":id",$this->ShopID);
+        if($stmt->execute()){
+            $stmt = $this->SingleShop($this->ShopID);
+            $num = $stmt->rowcount();
+            if($num>0){
+                $shop_arr=array();
+                $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                extract($row);
+                $shop_arr=array(
+                    "key" => "true",
+                    "ShopID" => $ShopID,
+                    "ShopName" => $ShopName,
+                    "Tagline" => $Tagline,
+                    "LogoImage" => $LogoImage,
+                    "Address" => $Address,
+                    "City" => $City,
+                    "State" => $State,
+                    "PhoneNo" => $PhoneNo,
+                    "Email" => $Email,
+                    "Website" => $Website,
+                    "OwnerName" => $OwnerName,
+                    "FacebookLink" => $FacebookLink,
+                    "InstagramLink" => $InstagramLink,
+                    "TwitterLink" => $TwitterLink,
+                    "YoutubeLink" => $YoutubeLink,
+                    "LogoAlt" => $LogoAlt,
+                    "GSTNo" => $GSTNo,
+                    "UserName" => $UserName,
+                    "Password" => $Password,
+                    "OldPassword" => $OldPassword,
+                    "PasswordUpdatedOn" => $PasswordUpdatedOn,
+                    "IsActive" => $IsActive,
+                    "CreatedOn" => $CreatedOn,
+                    "ShopType" => $ShopType,
+                    "ApprovedOn" => $ApprovedOn,
+                    "IsSessionActive" => $IsSessionActive,
+                    "IsApproved" => $IsApproved,
+                    "Pincode" => $Pincode
+                );
+
+                return json_encode($shop_arr);
+
+            }else{
+                return null;
+            }
+        }
+        return null;
     }
     
 
