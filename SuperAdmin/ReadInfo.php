@@ -27,11 +27,11 @@ if($num>0){
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     extract($row);
 
-    if($AdminName == null){
-        echo $AdminName;
-        $AdminName = "";
-        echo $AdminName;
-    }
+    // if($AdminName == null){
+    //     echo $AdminName;
+    //     $AdminName = "";
+    //     echo $AdminName;
+    // }
     
     $SuperAdmin_arr=array(
         "Adminid" => $AdminId,

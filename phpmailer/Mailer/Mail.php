@@ -1,7 +1,7 @@
 <?php
 
-include_once '../config/database.php';
-require("../phpmailer/Mailer/PHPMailer_5.2.0/class.PHPMailer.php");
+
+require_once('C:\xampp\htdocs\OnlineStoreApi\phpmailer\Mailer\PHPMailer_5.2.0\class.phpmailer.php');
 
 
 class SendMail {

@@ -311,12 +311,12 @@ class Shops {
 
     function ChangePassword($Id,$newpassword, $oldsendPassword){
 
-        $query = "SELECT * FROM " . $this->table_name . " WHERE ShopID = " . $ID;
+        $query = "SELECT * FROM " . $this->table_name . " WHERE ShopID = " . $Id;
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         extract($row);
-
+        $time = date('Y-m-d H:i:s');
         if($oldsendPassword == $Password){
             if ($Password == $newpassword ){
                 return '{ "key" : "same" }';
@@ -330,7 +330,7 @@ class Shops {
                 $stmt->bindparam(':newpassword',$newpassword);
                 $stmt->bindparam(':password',$Password);
                 $stmt->bindparam(':adminid',$Id);
-                $stmt->bindparam(':passwordupdatedon',date('Y-m-d H:i:s'));
+                $stmt->bindparam(':passwordupdatedon',$time);
                 $stmt->execute();
                 
                 if($stmt->rowcount() > 0) {
@@ -564,6 +564,8 @@ class Shops {
         $query = "UPDATE " . $this->table_name . " SET FacebookLink=:FacebookLink, YoutubeLink=:YoutubeLink,
         TwitterLink=:TwitterLink, InstagramLink=:InstagramLink WHERE ShopID=:id";
 
+        $stmt = $this->conn->prepare($query);
+
         $this->FacebookLink=htmlspecialchars(strip_tags($this->FacebookLink));
         $this->YoutubeLink=htmlspecialchars(strip_tags($this->YoutubeLink));
         $this->TwitterLink=htmlspecialchars(strip_tags($this->TwitterLink));
@@ -577,6 +579,60 @@ class Shops {
         if($stmt->execute())
             return true;
         return false;
+    }
+
+    function InitialSetup(){
+        $query = "UPDATE " . $this->table_name . " SET Username=:Username, Password=:Password, IsInitialSetup=1 WHERE ShopID=:id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindparam(":Username",$this->Username);
+        $stmt->bindparam(":Password",$this->Password);
+        $stmt->bindparam(":id",$this->ShopID);
+        if($stmt->execute()){
+            $stmt = $this->SingleShop($this->ShopID);
+            $num = $stmt->rowcount();
+            if($num>0){
+                $shop_arr=array();
+                $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                extract($row);
+                $shop_arr=array(
+                    "key" => "true",
+                    "ShopID" => $ShopID,
+                    "ShopName" => $ShopName,
+                    "Tagline" => $Tagline,
+                    "LogoImage" => $LogoImage,
+                    "Address" => $Address,
+                    "City" => $City,
+                    "State" => $State,
+                    "PhoneNo" => $PhoneNo,
+                    "Email" => $Email,
+                    "Website" => $Website,
+                    "OwnerName" => $OwnerName,
+                    "FacebookLink" => $FacebookLink,
+                    "InstagramLink" => $InstagramLink,
+                    "TwitterLink" => $TwitterLink,
+                    "YoutubeLink" => $YoutubeLink,
+                    "LogoAlt" => $LogoAlt,
+                    "GSTNo" => $GSTNo,
+                    "UserName" => $UserName,
+                    "Password" => $Password,
+                    "OldPassword" => $OldPassword,
+                    "PasswordUpdatedOn" => $PasswordUpdatedOn,
+                    "IsActive" => $IsActive,
+                    "CreatedOn" => $CreatedOn,
+                    "ShopType" => $ShopType,
+                    "ApprovedOn" => $ApprovedOn,
+                    "IsSessionActive" => $IsSessionActive,
+                    "IsApproved" => $IsApproved,
+                    "Pincode" => $Pincode
+                );
+
+                return json_encode($shop_arr);
+
+            }else{
+                return null;
+            }
+        }
+        return null;
     }
     
 

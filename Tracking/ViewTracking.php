@@ -1,15 +1,16 @@
 <?php
 
 include_once '../config/database.php';
-include_once './Orders.php';
+include_once './Tracking.php';
 
 $database = new Database();
 $db = $database->getConnection();
  
-$Order = new Order($db);
+$Tracking = new Tracking($db);
+//$id = $_GET['id'];
+$id = 4;
 
-$Order->ShopID = $_GET['id'];
-$stmt = $Order->GetOrders();
+$stmt = $Tracking->ViewTracking($id);
 $num = $stmt->rowCount();
  //echo $num;
 // check if more than 0 record found
@@ -23,16 +24,11 @@ if($num>0){
         extract($row);
  
         $shop_item=array(
-            "OrderID" => $OrderID,
-          "ProductName" => $ProductName,
-          "Qty" => $Qty,
-          "Price" => $Price,
-          "PhoneNo" => $PhoneNo,
-          "City" => $City,
-          "Status" => $Status,
-          "ProductID" => $PID,
-          "OrderDetailID" => $OrderDetailID,
-          "CustomerID" => $CID
+          "TrackingID" => $TrackingID,
+          "Text" => $TrackingText,
+          "ArrivedTime" => $ArrivedTime,
+          "DispatchedTime" => $DispatchedTime,
+          "Status" => $Status
 
         );
  

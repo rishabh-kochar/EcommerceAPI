@@ -8,8 +8,7 @@ $db = $database->getConnection();
  
 $Order = new Order($db);
 
-$Order->ShopID = $_GET['id'];
-$stmt = $Order->GetOrders();
+$stmt = $Order->Allorder();
 $num = $stmt->rowCount();
  //echo $num;
 // check if more than 0 record found
@@ -32,7 +31,8 @@ if($num>0){
           "Status" => $Status,
           "ProductID" => $PID,
           "OrderDetailID" => $OrderDetailID,
-          "CustomerID" => $CID
+          "CustomerID" => $CID,
+          "ShopName" => $ShopName
 
         );
  

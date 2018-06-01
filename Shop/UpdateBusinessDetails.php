@@ -13,13 +13,13 @@ $db = $database->getConnection();
  
 $Shops = new Shops($db);
  
-$data = json_decode(file_get_contents("php://input"));
+//$data = json_decode(file_get_contents("php://input"));
  
 $Shops->GSTNo = $_POST['GSTNo'];
 $Shops->LogoImage = $_POST['LogoImage'];
 $Shops->LogoAlt = $_POST['LogoAlt'];
-$Shops->Tagline = $_POST['Tagline'];
-$Shops->ShopID = $_POST['id'];
+$Shops->Tagline = $_POST['TagLine'];
+$Shops->ShopID = $_POST['ShopID'];
 
 $conn = $db;
  
@@ -58,7 +58,7 @@ if(isset($_FILES['image'])){
        $Shops->LogoImage = $rand . "_" . $file_name;
       
     }else{
-        echo '{ "key" : "false" }';
+        echo '{ "key" : "nup" }';
     }
  }
 

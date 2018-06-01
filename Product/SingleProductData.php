@@ -37,6 +37,52 @@ if($num>0){
             array_push($image_arr, $image_item);
         }
 
+        //Properties
+        $query = "SELECT * FROM tblcategoryproperties WHERE CategoryID=:id ORDER BY ColumnOrder";
+        $stmt = $db->prepare($query);
+        $stmt->bindparam(":id",$CategoryId);
+        $stmt->execute();
+        
+        $num = $stmt->rowCount();
+        //echo $num;
+        // check if more than 0 record found
+        $flag = 0;
+        if($num>0){
+                $properties=array();
+                
+                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)){
+                   
+                    extract($row);
+
+                    if($flag == 0){
+                        $query = "SELECT * FROM tblcategorypropertiesvalues WHERE ProductID=:pid AND CategoryPropertyID=:cid";
+                        $stmtvalue = $db->prepare($query);
+                        $stmtvalue->bindparam(":pid",$ProductId);
+                        $stmtvalue->bindparam(":cid",$CategoryPropertyID);
+                        $stmtvalue->execute();
+
+                        if($stmtvalue->rowcount()>0){
+                            $rowvalue = $stmtvalue->fetch(PDO::FETCH_ASSOC);
+                            $value = $rowvalue['Value'];
+                        }else{
+                            $flag=1;
+                            $value = "";
+                        }
+                    }
+                    
+                    $properties_item["IsFilter"]=$IsFilter;
+                    $properties_item["PropertyName"]=$PropertyName;
+                    $properties_item["Value"]=$IsFilter;
+                
+            
+                    array_push($properties, $properties_item);
+                }
+            }else{
+                $properties = null;
+            }
+
+
+
         if($IsActive == 1)
             $IsActive = "Yes";
         else
@@ -57,7 +103,9 @@ if($num>0){
             "LastStockUpdatedOn" => $LastStockUpdatedOn,
             "CreatedOn" => $CreatedOn,
             "LastUpdatedOn" => $LastUpdatedOn,
-            "image" => $image_arr
+            "image" => $image_arr,
+            "Properties" => $properties
+           
 
         );
 

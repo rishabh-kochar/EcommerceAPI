@@ -5,20 +5,23 @@ include_once './Shops.php';
 
 $database = new Database();
 $db = $database->getConnection();
- 
+
 $Shops = new Shops($db);
  
 $data = json_decode(file_get_contents("php://input"));
- 
-$Shops->FacebookLink = $data->FL;
-$Shops->YoutubeLink = $data->YL;
-$Shops->InstagramLink = $data->IL;
-$Shops->TwitterLink = $data->TL;
+
+$Shops->Username = $data->NUsername;
+$Shops->Password = $data->NPassword;
 $Shops->ShopID = $data->ShopID;
 
-$res = $Shops->UpdateSocialLinks();
-if($res)
-    echo '{"key":"true"}';
-else
+//$username = "rishabhkochar58@gmail.com";
+//$password = "rishabh";
+
+$stmt = $Shops->InitialSetup();
+if($stmt != null){
+    echo $stmt;
+}else{
     echo '{"key":"false"}';
+}
+
 ?>
