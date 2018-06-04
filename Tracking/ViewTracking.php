@@ -7,10 +7,15 @@ $database = new Database();
 $db = $database->getConnection();
  
 $Tracking = new Tracking($db);
-//$id = $_GET['id'];
-$id = 4;
+$id = $_GET['id'];
+if(isset($_GET['sid'])){
+    $sid = $_GET['sid'];
+}else{
+    $sid=0;
+}
+//$id = 4;
 
-$stmt = $Tracking->ViewTracking($id);
+$stmt = $Tracking->ViewTracking($id,$sid);
 $num = $stmt->rowCount();
  //echo $num;
 // check if more than 0 record found

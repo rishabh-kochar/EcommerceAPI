@@ -44,8 +44,8 @@ class Shops {
     function SignUp(){
   
             $query = "INSERT INTO " . $this->table_name . "(ShopName,PhoneNo,Email,OwnerName,IsActive,CreatedOn,ShopType,
-            UserName,Password)
-            values(:ShopName,:PhoneNo,:Email,:OwnerName,:IsActive,:CreatedOn,:ShopType,:Username,:Password); ";
+            UserName,Password,LogoImage)
+            values(:ShopName,:PhoneNo,:Email,:OwnerName,:IsActive,:CreatedOn,:ShopType,:Username,:Password,:LogoImage); ";
             $stmt = $this->conn->prepare($query);
 
             // sanitize
@@ -58,6 +58,7 @@ class Shops {
             //echo $this->AdminName;
             //echo $this->phone_no;
             $IsActive = 0;
+            $image = "Default.png";
             // bind values
             $stmt->bindParam(":ShopName", $this->ShopName);
             $stmt->bindParam(":PhoneNo", $this->PhoneNo);
@@ -68,6 +69,7 @@ class Shops {
             $stmt->bindParam(":CreatedOn", $this->CreatedOn);
             $stmt->bindParam(":Username", $randomUsername);
             $stmt->bindParam(":Password", $randompassword);
+            $stmt->bindparam(":LogoImage",$image);
             
             
             
@@ -285,27 +287,17 @@ class Shops {
 
     function CheckLogin($username,$password){
 
-        $query = "SELECT * FROM " . $this->table_name . " WHERE UserName = '" . $username . "' OR Email = '" . $username . "'
-                    OR PhoneNo = '" . $username ."' AND Password = '" . $password . "'
+        $query = "SELECT * FROM " . $this->table_name . " WHERE (UserName = :username OR Email = :username
+                    OR PhoneNo = :username) AND Password = :password
                     AND IsApproved = 1";
 
          //echo $query;
         $stmt = $this->conn->prepare($query);
+        $stmt->bindparam(":username",$username);
+        $stmt->bindparam(":password",$password);
         $stmt->execute();
+        return $stmt;
         
-        $num = $stmt->rowcount();
-        if($num>0){
-            $query = "UPDATE " . $this->table_name . " SET IsSessionActive = 1 WHERE UserName = '" . $username . "'";
-            //echo $query;
-            $stmtupdate = $this->conn->prepare($query);
-            if(!$stmtupdate->execute()){
-                echo '{"Key" : "session Failed"}';
-                return null;
-            }
-            return $stmt;
-        }else{
-            return null;
-        }
        
     }
 
@@ -634,8 +626,15 @@ class Shops {
         }
         return null;
     }
-    
 
+    function SameUsername($usrename){
+        $query = "SELECT * FROM tblshops WHERE Username=:Username";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindparam(":Username",$username);
+        $stmt->execute();
+        return $stmt;
+    }
+    
     
 }
 ?>

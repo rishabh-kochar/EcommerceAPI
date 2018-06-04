@@ -29,11 +29,12 @@ class SuperAdmin {
     function ReadInfo($id){
  
         // select all query
-        $query = "SELECT * FROM " . $this->table_name . " WHERE Adminid = " . $id;
+        $query = "SELECT * FROM " . $this->table_name . " WHERE Adminid = :id";
 
         // prepare query statement
         // echo $query;
         $stmt = $this->conn->prepare($query);
+        $stmt->bindparam(":id",$id);
 
         // execute query
         $stmt->execute();
@@ -43,28 +44,14 @@ class SuperAdmin {
 
     function CheckLogin($username,$password){
 
-        $query = "SELECT * FROM " . $this->table_name . " WHERE ( PhoneNo = '" . $username . "' OR Email = '" . $username . "') 
-                    AND Password = '" . $password . "'";
-
+        $query = "SELECT * FROM " . $this->table_name . " WHERE ( PhoneNo = :username OR Email = :username) 
+                    AND Password = :password ";
          //echo $query;
         $stmt = $this->conn->prepare($query);
+        $stmt->bindparam(":username",$username);
+        $stmt->bindparam(":password",$password);
         $stmt->execute();
-        
-        $num = $stmt->rowcount();
-        if($num>0){
-            $query = "UPDATE tbladmin SET IsSessionActive = 1 WHERE Email = '" . $username . "' OR PhoneNo = '" . $username . "'";
-            //echo $query;
-            $stmtupdate = $this->conn->prepare($query);
-            if(!$stmtupdate->execute()){
-                echo '{"Key" : "session Failed"}';
-                return null;
-            }
-            return $stmt;
-        }else{
-            return null;
-        }
-       
-
+        return $stmt;
     }
 
     function ChangePassword($Adminid, $newpassword, $oldsendPassword){
@@ -141,8 +128,9 @@ class SuperAdmin {
 
     function ForgetPassword($username){
 
-        $query = "SELECT * FROM " . $this->table_name . " WHERE Email = '" . $username . "' OR PhoneNo = '" . $username . "'"; 
+        $query = "SELECT * FROM " . $this->table_name . " WHERE Email = :username OR PhoneNo = :username"; 
         $stmt = $this->conn->prepare($query);
+        $stmt->bindparam(":username",$username);
         $stmt->execute();
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         extract($row);
@@ -216,22 +204,13 @@ class SuperAdmin {
                 $mail->AltBody = $message;
 
                 if(!$mail->Send())
-                {
-                //echo "Message could not be sent. <p>";
-                //echo "Mailer Error: " . $mail->ErrorInfo;
-                    
-                return "0";
-    
-                }else{
+                    return "0";
+                else{
                     $query = "UPDATE " . $this->table_name . " SET VerificationCode = '" . $generatedPassword ."' WHERE Email = '" . $username . "' OR PhoneNo = '" . $username . "'"; 
-                $stmt = $this->conn->prepare($query);
-                $stmt->execute();
-
-                return "1";
+                    $stmt = $this->conn->prepare($query);
+                    $stmt->execute();
+                    return "1";
                 }
-
-                
-        
         }else{
             return "2";
         }
@@ -248,9 +227,11 @@ class SuperAdmin {
 
     function ResetPassword($newpassword,$username,$verificationcode){
 
-        $query = "SELECT * FROM " . $this->table_name . " WHERE Email = '" . $username . "' OR 
-                    PhoneNo = '" . $username . "' AND VerificationCode = '" . $verificationcode . "'"; 
+        $query = "SELECT * FROM " . $this->table_name . " WHERE (Email = :username OR 
+                    PhoneNo = :username) AND VerificationCode = :verify"; 
         $stmt = $this->conn->prepare($query);
+        $stmt->bindparam(":username",$username);
+        $stmt->bindparam(":verify",$verificationcode);
         $stmt->execute();
 
         $num = $stmt->rowcount();
@@ -284,8 +265,9 @@ class SuperAdmin {
     }
 
     function RandomString($rand){
-        $query = "SELECT * FROM " . $this->table_name . " WHERE RandomString ='" . $rand ."'"; 
+        $query = "SELECT * FROM " . $this->table_name . " WHERE RandomString =:rand"; 
         $stmt = $this->conn->prepare($query);
+        $stmt->bindparam(":rand",$rand);
         $stmt->execute();
 
         $num = $stmt->rowcount();

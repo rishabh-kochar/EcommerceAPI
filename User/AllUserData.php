@@ -1,14 +1,14 @@
 <?php
 
 include_once '../config/database.php';
-include_once './Shops.php';
+include_once './User.php';
 
 $database = new Database();
 $db = $database->getConnection();
 
-$Shops = new Shops($db);
+$User = new User($db);
 
-$stmt = $Shops->NewShopData();
+$stmt = $User->AllUserData();
 $num = $stmt->rowCount();
  //echo $num;
 // check if more than 0 record found
@@ -22,15 +22,14 @@ if($num>0){
         extract($row);
  
         $shop_item=array(
-            "ShopID" => $ShopID,
-            "ShopName" => $ShopName,
-            "PhoneNo" => $PhoneNo,
+            "UserID" => $UserID,
+            "PhoneNO" => $PhoneNo,
             "Email" => $Email,
-            "OwnerName" => $OwnerName,
-            "IsActive" => $IsActive,
+            "Gender" => $Gender,
+            "Name" => $Name,
             "CreatedOn" => $CreatedOn,
-            "ShopType" => $ShopType,
-            "IsApproved" => $IsApproved
+            "IsActive" => $IsActive,
+            "ProfileImage" => $ProfileImage
         );
  
         array_push($shop_arr["records"], $shop_item);
@@ -40,7 +39,7 @@ if($num>0){
 }
  
 else{
-    echo '{"key":"false"}';
+    echo '{"key":"true"}';
 }
 
 ?>

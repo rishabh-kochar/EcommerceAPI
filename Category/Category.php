@@ -17,6 +17,7 @@ class Category {
     public $CategoryImageAlt;
     public $ShopID;
     public $IsActive;
+    public $IsApproved;
     public $LastUpdatedOn;
     public $CreatedOn;
 
@@ -38,9 +39,9 @@ class Category {
         $id = $this->CategoryID;
         if($id == "new"){
             $query = "INSERT INTO " . $this->table_name . " (CategoryName,CategoryDesc,ShopID,CreatedOn,IsActive,
-                        CategoryImage,CategoryImageAlt)
+                        CategoryImage,CategoryImageAlt, IsApproved)
                         values (:CategoryName,:CategoryDesc,:ShopID,:CreatedOn,:IsActive,
-                        :CategoryImage,:CategoryImageAlt);";
+                        :CategoryImage,:CategoryImageAlt,:IsApproved);";
         }else{
 
             $query = "UPDATE " . $this->table_name . " SET CategoryName=:CategoryName,CategoryDesc=:CategoryDesc,
@@ -53,6 +54,7 @@ class Category {
         if($id == "new"){
             $stmt->bindParam(":CreatedOn", $this->CreatedOn);
             $stmt->bindParam(":IsActive", $this->IsActive);
+            $stmt->bindParam(":IsApproved", $this->IsApproved);
         }else{
             $stmt->bindParam(":CategoryID", $id);
             $stmt->bindParam(":LastUpdatedOn", $this->LastUpdatedOn);

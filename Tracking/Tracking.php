@@ -28,7 +28,7 @@ class Tracking {
         $stmt->bindparam(":OrderDetailsID",$this->OrderDetailsID);
         $stmt->bindparam(":TrackingText",$this->TrackingText);
         $stmt->bindparam(":ArrivedTime",$this->ArrivedTime);
-        $stmt->bindparam(":ArrivedTime",$this->DispatchedTime);
+        $stmt->bindparam(":DispatchedTime",$this->DispatchedTime);
         $stmt->bindparam(":Status",$Status);
 
         if($stmt->execute())
@@ -37,13 +37,28 @@ class Tracking {
         
     }
 
-    function ViewTracking($id){
-        $query = "SELECT * FROM tbltracking t
+    function ViewTracking($id,$sid){
+        //echo $sid;
+        if($sid == 0){
+            $query = "SELECT * FROM tbltracking t
                     WHERE OrderDetailsID=:id ORDER BY ArrivedTime";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindparam(":id",$id);
-        $stmt->execute();
-        return $stmt;
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindparam(":id",$id);
+            $stmt->execute();
+            return $stmt;
+        }else{
+            $query = "SELECT * FROM tbltracking t
+                    LEFT JOIN tblorderdetails as od on t.OrderDetailsID = od.OrderDetailID
+                    LEFT JOIN tblproduct as p on od.ProductID = p.ProductID
+                    LEFT JOIN tblcategory as c on p.CategoryID = c.CategoryID 
+                    WHERE OrderDetailsID=:id AND ShopID=:sid ORDER BY ArrivedTime";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindparam(":id",$id);
+            $stmt->bindparam(":sid",$sid);
+            $stmt->execute();
+            return $stmt;
+        }
+        
 
 
     }
