@@ -7,7 +7,7 @@ class Order {
  
     // database connection and table name
     private $conn;
-    private $table_name = "tblOrders";
+    private $table_name = "tblorders";
      
     // object properties
     public $OrderID;
@@ -36,7 +36,7 @@ class Order {
         //$this->ShopID = 2;
         $query = "SELECT *,od.ProductID PID,o.UserID CID FROM tblorderdetails od
                     LEFT JOIN tblproduct as p on od.ProductID = p.ProductID
-                    LEFT JOIN tblCategory as c on p.CategoryID = c.CategoryID
+                    LEFT JOIN tblcategory as c on p.CategoryID = c.CategoryID
                     LEFT JOIN tblorders as o on od.OrderID = o.OrderID
                     LEFT JOIN tbluser as u on o.UserID = u.UserID
                     LEFT JOIN tbladdress as a on u.UserID = a.UserID
@@ -129,7 +129,7 @@ class Order {
     function Allorder(){
         $query = "SELECT *,od.ProductID PID,o.UserID CID FROM tblorderdetails od
                     LEFT JOIN tblproduct as p on od.ProductID = p.ProductID
-                    LEFT JOIN tblCategory as c on p.CategoryID = c.CategoryID
+                    LEFT JOIN tblcategory as c on p.CategoryID = c.CategoryID
                     LEFT JOIN tblorders as o on od.OrderID = o.OrderID
                     LEFT JOIN tbluser as u on o.UserID = u.UserID
                     LEFT JOIN tbladdress as a on u.UserID = a.UserID

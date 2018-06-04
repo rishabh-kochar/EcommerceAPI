@@ -627,10 +627,10 @@ class Shops {
         return null;
     }
 
-    function SameUsername($usrename){
+    function SameUsername($Username){
         $query = "SELECT * FROM tblshops WHERE Username=:Username";
         $stmt = $this->conn->prepare($query);
-        $stmt->bindparam(":Username",$username);
+        $stmt->bindparam(":Username",$Username);
         $stmt->execute();
         return $stmt;
     }

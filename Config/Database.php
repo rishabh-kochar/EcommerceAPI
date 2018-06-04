@@ -17,6 +17,11 @@ class Database{
     private $db_name = "onlinestore";
     private $username = "root";
     private $password = "";
+
+    // private $host = "209.99.16.19:3306";
+    // private $db_name = "OnlineStore";
+    // private $username = "Rishabh";
+    // private $password = "Loveyourself2509";
     public $conn;
  
     // get the database connection

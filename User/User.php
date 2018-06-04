@@ -45,7 +45,7 @@ class User {
         $query = "SELECT *,u.Name UserName,u.PhoneNo UserPhoneNo,a.Name AddressPhoneNo, a.Name AddressName 
                     FROM tbluser u
                     LEFT JOIN tblorders as o on u.UserID = o.UserID
-                    LEFT JOIN tblAddress as a on o.AddressID = a.AddressID
+                    LEFT JOIN tbladdress as a on o.AddressID = a.AddressID
                     WHERE o.UserID=:id AND o.OrderID=:oid";
         $stmt = $this->conn->prepare($query);
         $stmt->bindparam(":id",$cid);
