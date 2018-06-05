@@ -12,11 +12,21 @@ $data = json_decode(file_get_contents("php://input"));
 
 $Tracking->OrderDetailsID = $data->OrderDetailsID;
 $Tracking->TrackingText = $data->TrackingText;
-$Tracking->ArrivedTime = $data->ArrivedTime;
-$Tracking->DispatchedTime = $data->DispatchedTime;
 
+$ArrivedDate = $data->ArrivedDate;
+$DispatchedDate = $data->DispatchedDate;
+$ArrivedTime = $data->ArrivedTime;
+$DispatchedTime = $data->DispatchedTime;
+
+$ArrivedTime = date("H:i", strtotime($ArrivedTime));
+$DispatchedTime = date("H:i", strtotime($DispatchedTime));
+
+$Tracking->ArrivedTime = date('Y-m-d H:i:s', strtotime("$ArrivedDate $ArrivedTime"));
+$Tracking->DispatchedTime = date('Y-m-d H:i:s', strtotime("$DispatchedDate $DispatchedTime"));
 // $AdminId = 1;
 // $Password = "store";
+//echo $Tracking->ArrivedTime . "\n";
+//echo $Tracking->DispatchedTime;
 
 $stmt = $Tracking->AddTracking();
 

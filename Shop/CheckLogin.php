@@ -17,12 +17,7 @@ $password = $data->password;
 //$password = "rishabh";
 
 $stmt = $Shops->CheckLogin($username,$password);
-if($stmt != null){
-    $num = $stmt->rowCount();
-}else{
-    $num = 0;
-}
-
+$num = $stmt->rowCount();
 
 if($num>0){
  

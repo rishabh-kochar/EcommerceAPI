@@ -58,7 +58,7 @@ if($num>0){
 }
  
 else{
-    echo "False";
+    echo '{"key":"false"}';
 }
 
 ?>

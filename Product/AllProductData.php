@@ -31,7 +31,7 @@ if($num>0){
         
         extract($row);
 
-        $query = "SELECT * FROM tblproductImage WHERE ProductID=:id";
+        $query = "SELECT * FROM tblproductimage WHERE ProductID=:id";
         $stmt1 = $db->prepare($query);
         $stmt1->bindparam(":id",$ProductId);
         $stmt1->execute();

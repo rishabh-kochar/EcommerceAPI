@@ -19,6 +19,7 @@ $Category->CategoryName = $_POST['CategoryName'];
 $Category->CategoryDesc = $_POST['CategoryDesc'];
 $Category->ShopID = $_POST['ShopID'];
 $Category->IsActive = 1;
+$Category->IsApproved = 1;
 $Category->CreatedOn = date('Y-m-d H:i:s');
 $Category->LastUpdatedOn = date('Y-m-d H:i:s');
 $Category->CategoryImage = $_POST['CategoryImage'];

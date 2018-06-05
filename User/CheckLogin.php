@@ -1,13 +1,13 @@
 <?php
 
 include_once '../config/database.php';
-include_once 'SuperAdmin.php';
+include_once './User.php';
 
 $database = new Database();
 $db = $database->getConnection();
 
-$SuperAdmin = new SuperAdmin($db);
-
+$User = new User($db);
+ 
 $data = json_decode(file_get_contents("php://input"));
 
 $username = $data->username;
@@ -16,8 +16,9 @@ $password = $data->password;
 //$username = "rishabhkochar58@gmail.com";
 //$password = "rishabh";
 
-$stmt = $SuperAdmin->CheckLogin($username,$password);
+$stmt = $User->CheckLogin($username,$password);
 $num = $stmt->rowCount();
+
 
 
 if($num>0){
@@ -28,16 +29,12 @@ if($num>0){
     extract($row);
     
     $SuperAdmin_arr=array(
-        "Adminid" => $AdminId,
-        "Adminname" => $AdminName,
-        "AdminImage" => $AdminImage,
-        "PhoneNo" => $PhoneNo,
+        "UserID" => $UserID,
+        "PhoneNO" => $PhoneNo,
         "Email" => $Email,
-        "Password" => $Password,
-        "OldPassword" => $OldPassword,
-        "CreatedOn" => $CreatedOn,
-        "PasswordUpdatedOn" => $PasswordUpdatedOn,
-        "IsSessionActive" => $IsSessionActive
+        "Gender" => $Gender,
+        "Name" => $Name,
+        "CreatedOn" => $CreatedOn
     );
         
     echo json_encode($SuperAdmin_arr);

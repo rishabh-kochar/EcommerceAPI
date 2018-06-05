@@ -7,7 +7,7 @@ class Order {
  
     // database connection and table name
     private $conn;
-    private $table_name = "tblOrders";
+    private $table_name = "tblorders";
      
     // object properties
     public $OrderID;
@@ -36,11 +36,11 @@ class Order {
         //$this->ShopID = 2;
         $query = "SELECT *,od.ProductID PID,o.UserID CID FROM tblorderdetails od
                     LEFT JOIN tblproduct as p on od.ProductID = p.ProductID
-                    LEFT JOIN tblCategory as c on p.CategoryID = c.CategoryID
+                    LEFT JOIN tblcategory as c on p.CategoryID = c.CategoryID
                     LEFT JOIN tblorders as o on od.OrderID = o.OrderID
                     LEFT JOIN tbluser as u on o.UserID = u.UserID
                     LEFT JOIN tbladdress as a on u.UserID = a.UserID
-                    WHERE c.ShopID=:shopid
+                    WHERE p.ShopID=:shopid
                     ORDER BY OrderDetailID DESC";
         $stmt = $this->conn->prepare($query);
         $stmt->bindparam(":shopid",$this->ShopID);
@@ -129,11 +129,11 @@ class Order {
     function Allorder(){
         $query = "SELECT *,od.ProductID PID,o.UserID CID FROM tblorderdetails od
                     LEFT JOIN tblproduct as p on od.ProductID = p.ProductID
-                    LEFT JOIN tblCategory as c on p.CategoryID = c.CategoryID
+                    LEFT JOIN tblcategory as c on p.CategoryID = c.CategoryID
                     LEFT JOIN tblorders as o on od.OrderID = o.OrderID
                     LEFT JOIN tbluser as u on o.UserID = u.UserID
                     LEFT JOIN tbladdress as a on u.UserID = a.UserID
-                    LEFT JOIN tblshops as s on c.ShopID = s.ShopID
+                    LEFT JOIN tblshops as s on p.ShopID = s.ShopID
                     ORDER BY OrderDetailID DESC";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();

@@ -17,6 +17,7 @@ class Category {
     public $CategoryImageAlt;
     public $ShopID;
     public $IsActive;
+    public $IsApproved;
     public $LastUpdatedOn;
     public $CreatedOn;
 
@@ -38,9 +39,9 @@ class Category {
         $id = $this->CategoryID;
         if($id == "new"){
             $query = "INSERT INTO " . $this->table_name . " (CategoryName,CategoryDesc,ShopID,CreatedOn,IsActive,
-                        CategoryImage,CategoryImageAlt)
+                        CategoryImage,CategoryImageAlt, IsApproved)
                         values (:CategoryName,:CategoryDesc,:ShopID,:CreatedOn,:IsActive,
-                        :CategoryImage,:CategoryImageAlt);";
+                        :CategoryImage,:CategoryImageAlt,:IsApproved);";
         }else{
 
             $query = "UPDATE " . $this->table_name . " SET CategoryName=:CategoryName,CategoryDesc=:CategoryDesc,
@@ -53,6 +54,7 @@ class Category {
         if($id == "new"){
             $stmt->bindParam(":CreatedOn", $this->CreatedOn);
             $stmt->bindParam(":IsActive", $this->IsActive);
+            $stmt->bindParam(":IsApproved", $this->IsApproved);
         }else{
             $stmt->bindParam(":CategoryID", $id);
             $stmt->bindParam(":LastUpdatedOn", $this->LastUpdatedOn);
@@ -107,16 +109,16 @@ class Category {
 
         $flag = 1;
         
-            $id = ($PropertyData)->{"ID"};
+            $id = $PropertyData->{"ID"};
             if($id == "new"){
                 $query = "INSERT INTO tblcategoryproperties (CategoryID,PropertyName,PropertyDesc,Isfilter, ColumnOrder) 
                 values(:CategoryID,:PropertyName,:PropertyDesc,:Isfilter,:ColumnOrder);";
 
                 $stmt = $this->conn->prepare($query);
-                $this->PropertyName = ($PropertyData)->{"PropertyName"};
-                $this->PropertyDesc = ($PropertyData)->{"PropertyDesc"};
-                $this->IsFilter = ($PropertyData)->{"IsFilterable"};
-                $this->ColumnOrder = ($PropertyData)->{"ColumnOrder"};
+                $this->PropertyName = $PropertyData->{"PropertyName"};
+                $this->PropertyDesc = $PropertyData->{"PropertyDesc"};
+                $this->IsFilter = $PropertyData->{"IsFilterable"};
+                $this->ColumnOrder = $PropertyData->{"ColumnOrder"};
                 $stmt->bindparam(":CategoryID",$Categoryid);
                 $stmt->bindparam(":PropertyName",$this->PropertyName);
                 $stmt->bindparam(":PropertyDesc", $this->PropertyDesc);
@@ -130,10 +132,10 @@ class Category {
                 Isfilter=:Isfilter,ColumnOrder=:ColumnOrder WHERE CategoryPropertyID=:id";
                 $stmt = $this->conn->prepare($query);
                 
-                $this->PropertyName = ($PropertyData)->{"PropertyName"};
-                $this->PropertyDesc = ($PropertyData)->{"PropertyDesc"};
-                $this->IsFilter = ($PropertyData)->{"IsFilterable"};
-                $this->ColumnOrder = ($PropertyData)->{"ColumnOrder"};
+                $this->PropertyName = $PropertyData->{"PropertyName"};
+                $this->PropertyDesc = $PropertyData->{"PropertyDesc"};
+                $this->IsFilter = $PropertyData->{"IsFilterable"};
+                $this->ColumnOrder = $PropertyData->{"ColumnOrder"};
                 $stmt->bindparam(":CategoryId",$Categoryid);
                 $stmt->bindparam(":id",$id);
                 $stmt->bindparam(":PropertyName",$this->PropertyName);
@@ -192,7 +194,7 @@ class Category {
     function CategoryPropertyData($id){
 
         $query = "SELECT * FROM tblcategoryproperties cp
-                LEFT JOIN tblCategory as c on cp.CategoryID = c.CategoryID  
+                LEFT JOIN tblcategory as c on cp.CategoryID = c.CategoryID  
                 WHERE IsActive=1 AND cp.CategoryID=:id 
                 ORDER BY ColumnOrder;";
         //echo $query;
@@ -204,7 +206,7 @@ class Category {
     }
 
     function SetApproveStatus($id,$status){
-        $query = "UPDATE " . $this->table_name . " SET IsApproved=:status WHERE CategoryID=:CategoryID";
+        $query = "UPDATE " . $this->table_name . " SET IsApproved=:status, IsActive=:status WHERE CategoryID=:CategoryID";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":status", $status);
         $stmt->bindParam(":CategoryID", $id);
