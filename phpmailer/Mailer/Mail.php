@@ -1,8 +1,8 @@
 <?php
 
 
+//require_once('http://onlinestoreapi.riteshtailor.in\OnlinestoreApi\phpmailer\Mailer\PHPMailer_5.2.0\class.phpmailer.php');
 require_once('C:\xampp\htdocs\OnlineStoreApi\phpmailer\Mailer\PHPMailer_5.2.0\class.phpmailer.php');
-
 
 class SendMail {
 

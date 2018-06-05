@@ -26,6 +26,7 @@ class Product {
     public $CreatedOn;
     public $LastUpdatedOn;
     public $image;
+    public $ShopID;
 
     //Properties
     public $CategoryPropertyID;
@@ -44,9 +45,9 @@ class Product {
         $id = $this->ProductID;
         if($id == "new"){
             $query = "INSERT INTO tblproduct(CategoryID, ProductName, ProductDesc, Price,
-                        Unit, MinStock, IsActive, IsApproved, CreatedOn, ImageAlt, CurrentStock) VALUES 
+                        Unit, MinStock, IsActive, IsApproved, CreatedOn, ImageAlt, CurrentStock, ShopID) VALUES 
                         (:CategoryID,:ProductName,:ProductDesc,:Price,
-                        :Unit,:MinStock,:IsActive,:IsApproved,:CreatedOn,:LogoAlt,:CurrentStock)";
+                        :Unit,:MinStock,:IsActive,:IsApproved,:CreatedOn,:LogoAlt,:CurrentStock,:ShopID)";
         }else{
 
             $query = "UPDATE tblproduct SET CategoryID=:CategoryID, ProductName=:ProductName, ProductDesc=:ProductDesc,
@@ -61,6 +62,7 @@ class Product {
             $stmt->bindParam(":IsActive", $this->IsActive);
             $stmt->bindparam(":IsApproved", $this->IsApproved);
             $stmt->bindParam(":CurrentStock", $stock);
+            $stmt->bindParam(":ShopID", $this->ShopID);
         }else{
             $stmt->bindParam(":ProductID", $id);
             $stmt->bindParam(":LastUpdatedOn", $this->LastUpdatedOn);
@@ -91,7 +93,7 @@ class Product {
     function ProductData($id){
         $query = "SELECT * FROM tblproduct p
                     LEFT JOIN tblcategory as c on p.CategoryID = c.CategoryID
-                    LEFT JOIN tblShops as s on c.ShopID = s.ShopID
+                    LEFT JOIN tblshops as s on p.ShopID = s.ShopID
                     WHERE p.IsApproved=1 and s.ShopID=:shopid 
                     ORDER BY ProductID DESC";
         $stmt = $this->conn->prepare($query);
@@ -103,7 +105,7 @@ class Product {
     function SingleProductData($id){
         $query = "SELECT * FROM tblproduct p
                     LEFT JOIN tblcategory as c on p.CategoryID = c.CategoryID
-                    LEFT JOIN tblShops as s on c.ShopID = s.ShopID
+                    LEFT JOIN tblshops as s on p.ShopID = s.ShopID
                     LEFT JOIN tblcategoryproperties as cp on c.CategoryID = c.CategoryID
                     LEFT JOIN tblcategorypropertiesvalues as cpv on cp.CategoryPropertyID = cpv.CategoryPropertyID
                     WHERE p.IsApproved=1 and p.ProductID=:id";
@@ -188,7 +190,7 @@ class Product {
     function AllProduct(){
         $query = "SELECT *,p.IsApproved ProductApproved FROM " . $this->table_name . " p
                     LEFT JOIN tblcategory as c on p.CategoryID = c.CategoryID
-                    LEFT JOIN tblShops as s on c.ShopID = s.ShopID
+                    LEFT JOIN tblshops as s on p.ShopID = s.ShopID
                     ORDER BY ProductId";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();

@@ -206,7 +206,7 @@ class Category {
     }
 
     function SetApproveStatus($id,$status){
-        $query = "UPDATE " . $this->table_name . " SET IsApproved=:status WHERE CategoryID=:CategoryID";
+        $query = "UPDATE " . $this->table_name . " SET IsApproved=:status, IsActive=:status WHERE CategoryID=:CategoryID";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":status", $status);
         $stmt->bindParam(":CategoryID", $id);

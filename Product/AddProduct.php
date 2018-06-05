@@ -34,6 +34,7 @@ $Product->Price = $_POST['Price'];
 $Product->Logoalt = $_POST['LogoAlt'];
 $Product->MinStock = $_POST['MinStock'];
 $Product->LogoAlt = $_POST['LogoAlt'];
+$Product->ShopID = $_POST['ShopID'];
 
  
 $conn = $db;
