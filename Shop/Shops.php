@@ -2,7 +2,7 @@
 
 include_once '../config/database.php';
 require_once '../Notification/Notification.php';
-include_once '../phpmailer/Mailer/Mail.php';
+require_once '../phpmailer/Mailer/Mail.php';
 
 
 class Shops {
@@ -216,8 +216,18 @@ class Shops {
         $stmt->bindparam(":id",$id);
         $stmt->bindparam(":status",$status);
         
-        if( $stmt->execute())
-            return '{"key":"true"}';
+        if( $stmt->execute()){
+                $Notification = new Notification($this->conn);
+                $Notification->URL = "/shopProfile";
+                $Notification->Type = "0";
+                $Notification->Image = "fa-handshake";
+                $Notification->IsRead = "0";
+                $Notification->NotificationText = "Welcome to " . $websitedata['Name'] . ".";
+                $Notification->CreatedOn = date('Y-m-d H:i:s');
+                $Notification->AddNotification();
+                return '{"key":"true"}';
+        }
+            
         return '{"key":"false"}';
     }
 
