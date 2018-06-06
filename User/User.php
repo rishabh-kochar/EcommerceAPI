@@ -114,7 +114,161 @@ class User {
         if( $stmt->execute())
             return true;
         return false;
-    } 
+    }
+
+    function ForgetPassword($userName){
+        $query = "SELECT * FROM " . $this->table_name . " WHERE  
+                    Email = :Username OR PhoneNo = :Username"; 
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindparam(":Username",$userName)
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+       
+        
+        if($userName == $row['Email'] || $userName == $row['PhoneNo'] ){
+
+
+                $query = "SELECT * FROM tblwebsite WHERE id = 1";
+                $websitestmt = $this->conn->prepare($query);
+                $websitestmt->execute();
+                $websitedata = $websitestmt->fetch(PDO::FETCH_ASSOC);
+                $mail = new SendMail();
+                
+                // Random String
+                do{
+
+                    $randomString = $this->randompassword(10);
+                    $query = "UPDATE " . $this->table_name . " SET RandomString = '" . $randomString ."', 
+                                RandomStringTime = '" . date('Y-m-d H:i:s') . "' WHERE Email = '" . $username . "' OR 
+                                PhoneNo = '" . $username . "'";
+                    //echo $query;
+                    $stmt = $this->conn->prepare($query);
+
+                }while(!$stmt->execute());
+
+
+                $Subject = "Reset Password";
+                $generatedPassword = $this->randompassword(8);
+                $message = '<h1>Hello ' . $row['Name'];
+                $message .= '<p>To Reset Password <a href="http://localhost:4200/reset?rand=' . $randomString . '&type=shop">Click Here</a></p>';
+                $message .= '<p> Your Verification Code is : <b>' . $generatedPassword . '</b> </p>';
+        
+            
+
+                if(!$mail->send($row['Email'],$Subject,$message))
+                {
+               
+                    
+                return "0";
+    
+                }else{
+                    $query = "UPDATE " . $this->table_name . " SET VerificationCode = '" . $generatedPassword ."' WHERE Email = '" . $username . "'"; 
+                $stmt = $this->conn->prepare($query);
+                $stmt->execute();
+
+                return "1";
+                }
+
+                
+        
+        }else{
+            return "2";
+        }
+    }
+
+    function ResetPassword($newpassword,$username,$verificationcode){
+
+        $query = "SELECT * FROM " . $this->table_name . " WHERE  
+                 (Email = '" . $username . "' OR 
+                 PhoneNo = '" . $username . "') AND VerificationCode = '" . $verificationcode . "'"; 
+        //echo $query;
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+
+        
+        $num = $stmt->rowcount();
+        if($num>0){
+
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if($row['Password'] == $newpassword){
+                return "2";
+            }elseif($row['OldPassword'] == $newpassword){
+                return "3";
+            }else{
+                $time = date('Y-m-d H:i:s');
+
+                $query = "UPDATE " . $this->table_name . " SET Password = :newpassword , OldPassword = :password 
+                , PasswordUpdatedOn=:passwordupdatedon, RandomString='' WHERE UserID = :adminid";
+                //echo $query;
+                $stmt = $this->conn->prepare($query);
+                $stmt->bindparam(':newpassword',$newpassword);
+                $stmt->bindparam(':password',$row['Password']);
+                $stmt->bindparam(':adminid',$row['UserID']);
+                $stmt->bindparam(':passwordupdatedon',$time);
+                $stmt->execute();
+                return "1";
+            }
+            
+        }else{
+            return "0";
+        }
+
+    }
+
+    function RandomString($rand){
+        $query = "SELECT * FROM " . $this->table_name . " WHERE RandomString ='" . $rand ."'"; 
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+
+        $num = $stmt->rowcount();
+        if($num>0){
+            return $stmt;
+
+        }else{
+            return null;
+        }
+
+    }
+
+    function ChangePassword($Id,$newpassword, $oldsendPassword){
+
+        $query = "SELECT * FROM " . $this->table_name . " WHERE UserID = " . $Id;
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        extract($row);
+        $time = date('Y-m-d H:i:s');
+        if($oldsendPassword == $Password){
+            if ($Password == $newpassword ){
+                return '{ "key" : "same" }';
+            }elseif($newpassword == $OldPassword)
+                return '{ "key" : "oldsame" }';
+            else{
+                $query = "UPDATE " . $this->table_name . " SET Password = :newpassword , OldPassword = :password 
+                        , PasswordUpdatedOn=:passwordupdatedon WHERE UserID = :adminid";
+                //echo $query;
+                $stmt = $this->conn->prepare($query);
+                $stmt->bindparam(':newpassword',$newpassword);
+                $stmt->bindparam(':password',$Password);
+                $stmt->bindparam(':adminid',$Id);
+                $stmt->bindparam(':passwordupdatedon',$time);
+                $stmt->execute();
+                
+                if($stmt->rowcount() > 0) {
+                    return '{ "key" : "true" }';
+                }else{
+                    return '{ "key" : "false" }';
+                }
+    
+            }
+        }else{
+            return '{ "key" : "incorrect" }';
+        }
+    }
+
+
 
     
 
