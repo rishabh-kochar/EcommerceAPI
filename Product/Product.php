@@ -1,6 +1,7 @@
 <?php
 
 include_once '../config/database.php';
+require_once '../Notification/Notification.php';
 
 
 class Product {
@@ -80,8 +81,18 @@ class Product {
         
          
         if($stmt->execute()){
-            if($id == "new")
+            if($id == "new"){
+                $Notification = new Notification($this->conn);
+                $Notification->URL = "/suproduct";
+                $Notification->Type = "1";
+                $Notification->Image = "fa-gift";
+                $Notification->IsRead = "0";
+                $Notification->NotificationText = $this->ProductName . " Product Added.";
+                $Notification->CreatedOn = date('Y-m-d H:i:s');
+                $Notification->AddNotification();
                 $id = $this->conn->lastInsertId();
+            }
+               
                 return $id;
         }
      
@@ -91,11 +102,11 @@ class Product {
     }
 
     function ProductData($id){
-        $query = "SELECT * FROM tblproduct p
-                    LEFT JOIN tblcategory as c on p.CategoryID = c.CategoryID
-                    LEFT JOIN tblshops as s on p.ShopID = s.ShopID
-                    WHERE p.IsApproved=1 and s.ShopID=:shopid 
-                    ORDER BY ProductID DESC";
+        $query = "SELECT *,p.IsActive prodActive FROM tblproduct p
+        LEFT JOIN tblcategory as c on p.CategoryID = c.CategoryID
+        LEFT JOIN tblshops as s on p.ShopID = s.ShopID
+        WHERE p.IsApproved=1 and s.ShopID=:shopid 
+        ORDER BY ProductID DESC";
         $stmt = $this->conn->prepare($query);
         $stmt->bindparam(":shopid",$id);
         $stmt->execute();
@@ -141,7 +152,10 @@ class Product {
         //echo $this->ProductID;
         $res = $this->SingleProductData($this->ProductID);
         $row = $res->fetch(PDO::FETCH_ASSOC);
-       
+        
+        //echo $row['MinStock'] . "<" . ($row['CurrentStock'] + $stock); 
+        if($row['MinStock'] < ($row['CurrentStock'] + $stock))
+            return false;
         //echo $row['ProductName'];
         //echo $row['CurrentStock'];
        
@@ -199,6 +213,17 @@ class Product {
 
     function DisableProduct($id,$status){
         $query = "UPDATE " . $this->table_name . " SET IsApproved=:status WHERE ProductId=:ProductId";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":ProductId", $id);
+        $stmt->bindParam(":status", $status);
+        if($stmt->execute()){
+            return true;
+        }
+        return false;   
+    }
+
+    function ActiveStatusProduct($id,$status){
+        $query = "UPDATE " . $this->table_name . " SET IsActive=:status WHERE ProductId=:ProductId";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":ProductId", $id);
         $stmt->bindParam(":status", $status);

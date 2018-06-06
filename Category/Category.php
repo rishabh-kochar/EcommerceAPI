@@ -69,8 +69,18 @@ class Category {
         
          
         if($stmt->execute()){
-            if($id == "new")
+            if($id == "new"){
                 $id = $this->conn->lastInsertId();
+                $Notification = new Notification($this->conn);
+                $Notification->URL = "/sucategory";
+                $Notification->Type = "1";
+                $Notification->Image = "fa-list";
+                $Notification->IsRead = "0";
+                $Notification->NotificationText = $this->CategoryName . " Category Added.";
+                $Notification->CreatedOn = date('Y-m-d H:i:s');
+                $Notification->AddNotification();
+            }
+                
             return '{"key":"true","id":"' . $id. '","CategoryImage":"'.$this->CategoryImage.'"}';
         }
      

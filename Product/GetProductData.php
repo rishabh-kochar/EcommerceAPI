@@ -15,11 +15,6 @@ $id = $_GET['id'];
 
 $stmt = $Product->ProductData($id);
 $num = $stmt->rowCount();
- //echo $num;
-// check if more than 0 record found
-
-      
-        //print_r($image_arr);
 
 
 if($num>0){
@@ -46,10 +41,6 @@ if($num>0){
             $i++;
         }
  
-        if($IsActive == 1)
-            $IsActive = "Yes";
-        else
-            $IsActive = "No";
  
         $shop_item=array(
             "ProductID" => $ProductId,
@@ -62,7 +53,7 @@ if($num>0){
             "Unit" => $Unit,
             "MinStock" => $MinStock,
             "CurrentStock" => $CurrentStock,
-            "IsActive" => $IsActive,
+            "IsActive" => $prodActive,
             "IsApproved" => $IsApproved,
             "LastStockUpdatedOn" => $LastStockUpdatedOn,
             "CreatedOn" => $CreatedOn,
