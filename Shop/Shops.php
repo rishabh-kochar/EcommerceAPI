@@ -310,73 +310,38 @@ class Shops {
                 $websitestmt = $this->conn->prepare($query);
                 $websitestmt->execute();
                 $websitedata = $websitestmt->fetch(PDO::FETCH_ASSOC);
-                $mail = new PHPMailer();
-
-                // set mailer to use SMTP
-                $mail->IsSMTP();
-
-                // As this email.php script lives on the same server as our email server
-                // we are setting the HOST to localhost
-                $mail->Host = "smtp.gmail.com";  // specify main and backup server
-
-                $mail->SMTPAuth = true;     // turn on SMTP authentication
-                $mail->Port=465;
-                $mail->SMTPSecure = "ssl";
-                // When sending email using PHPMailer, you need to send from a valid email address
-                // In this case, we setup a test email account with the following credentials:
-                // email: send_from_PHPMailer@bradm.inmotiontesting.com
-                // pass: password
-                $mail->Username = $websitedata['Email'];  // SMTP username
-                $mail->Password = $websitedata['Password']; // SMTP password
-
-                // $email is the user's email address the specified
-                // on our contact us page. We set this variable at
-                // the top of this page with:
-                // $email = $_REQUEST['email'] ;
-                $mail->From = $websitedata['Email'] ;
-                $mail->FromName = $websitedata['Name'] ;
-
+                $mail = new SendMail();
+                
                 // Random String
                 do{
 
                     $randomString = $this->randompassword(10);
-                    $query = "UPDATE " . $this->table_name . " SET RandomString = '" . $randomString ."', RandomStringTime = '" . date('Y-m-d H:i:s') . "' WHERE Email = '" . $username . "' OR PhoneNo = '" . $username . "'";
+                    $query = "UPDATE " . $this->table_name . " SET RandomString = '" . $randomString ."', 
+                                RandomStringTime = '" . date('Y-m-d H:i:s') . "' WHERE Email = '" . $username . "' OR 
+                                PhoneNo = '" . $username . "' OR UserName = '" . $username . "'";
                     //echo $query;
                     $stmt = $this->conn->prepare($query);
 
                 }while(!$stmt->execute());
 
 
-                // below we want to set the email address we will be sending our email to.
-                $mail->AddAddress($row['Email']);
-
-
-                $mail->IsHTML(true);
-
-                $mail->Subject = "Reset Password";
+                $Subject = "Reset Password";
                 $generatedPassword = $this->randompassword(8);
                 $message = '<h1>Hello ' . $row['ShopName']  . '('. $row['OwnerName'] .'),</h1>';
                 $message .= '<p>To Reset Password <a href="http://localhost:4200/reset?rand=' . $randomString . '&type=shop">Click Here</a></p>';
                 $message .= '<p> Your Verification Code is : <b>' . $generatedPassword . '</b> </p>';
         
-                
+            
 
-                // $message is the user's message they typed in
-                // on our contact us page. We set this variable at
-                // the top of this page with:
-                // $message = $_REQUEST['message'] ;
-                $mail->Body    = $message;
-                $mail->AltBody = $message;
-
-                if(!$mail->Send())
+                if(!$mail->send($row['Email'],$Subject,$message))
                 {
-                //echo "Message could not be sent. <p>";
-                //echo "Mailer Error: " . $mail->ErrorInfo;
+               
                     
                 return "0";
     
                 }else{
-                    $query = "UPDATE " . $this->table_name . " SET VerificationCode = '" . $generatedPassword ."' WHERE Username = '" . $username . "'"; 
+                    $query = "UPDATE " . $this->table_name . " SET VerificationCode = '" . $generatedPassword ."' 
+                                    WHERE Username = '" . $username . "'"; 
                 $stmt = $this->conn->prepare($query);
                 $stmt->execute();
 
