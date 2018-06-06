@@ -27,6 +27,9 @@ class SendMail {
                 $mail->SMTPAuth = true;     // turn on SMTP authentication
                 $mail->Port=465;
                 $mail->SMTPSecure = "ssl";
+
+                if(!isset($websitedata['Email']) || !isset($websitedata['Password']))
+                    return false;
                 
                 $mail->Username = $websitedata['Email'];  // SMTP username
                 $mail->Password = $websitedata['Password']; // SMTP password

@@ -2,6 +2,7 @@
 
 include_once '../config/database.php';
 include_once '../phpmailer/Mailer/Mail.php';
+require_once '../Notification/Notification.php';
 
 
 class Feedback {
@@ -36,8 +37,18 @@ class Feedback {
         $stmt->bindParam(":Feedback", $this->Feedback);
         $stmt->bindParam(":CreatedOn", $this->CreatedOn);
 
-        if($stmt->execute())
+        if($stmt->execute()){
+            $Notification = new Notification($this->conn);
+                $Notification->URL = "/feedback";
+                $Notification->Type = "1";
+                $Notification->Image = "fa-comments";
+                $Notification->IsRead = "0";
+                $Notification->NotificationText = $this->Name . " Added a query.";
+                $Notification->CreatedOn = date('Y-m-d H:i:s');
+                $Notification->AddNotification();
             return true;
+        }
+            
         return false;
 
     }

@@ -1,7 +1,8 @@
 <?php
 
 include_once '../config/database.php';
-require("../phpmailer/Mailer/PHPMailer_5.2.0/class.PHPMailer.php");
+require_once '../Notification/Notification.php';
+include_once '../phpmailer/Mailer/Mail.php';
 
 
 class Shops {
@@ -80,42 +81,27 @@ class Shops {
                 $websitestmt = $this->conn->prepare($query);
                 $websitestmt->execute();
                 $websitedata = $websitestmt->fetch(PDO::FETCH_ASSOC);
-                $mail = new PHPMailer();
+                $mail = new SendMail();
 
             
-                $mail->IsSMTP();
-                $mail->Host = "smtp.gmail.com";  
-
-                $mail->SMTPAuth = true;     
-                $mail->Port=465;
-                $mail->SMTPSecure = "ssl";
-                if(!isset($websitedata['Email']) || !isset($websitedata['Password']))
-                    return '{"key":"fasle"}';
-
-                $mail->Username = $websitedata['Email'];  
-                $mail->Password = $websitedata['Password']; 
-
-            
-                $mail->From = $websitedata['Email'] ;
-                $mail->FromName = $websitedata['Name'] ;
-
-        
-                $mail->AddAddress($this->Email);
-
-
-                $mail->IsHTML(true);
-
-                $mail->Subject = "Welcome To" . $websitedata['Name'] ;
+                $Subject = "Welcome To" . $websitedata['Name'] ;
                 $message = '<h1>Hello ' . $this->OwnerName . ',</h1>';
                 $message .= '<p>Welcome to ' . $websitedata['Name'] . '. Your requested has been forwarded to the Administrator. 
                                 You will Receive Response in Very short time.</p>';
                 
 
-                $mail->Body    = $message;
-                $mail->AltBody = $message;
+          
 
-                if(!$mail->Send())
+                if(!$mail->send($this->Email,$Subject,$message))
                     return '{"key":"Error: ' . $mail->ErrorInfo . '"}';
+                $Notification = new Notification($this->conn);
+                $Notification->URL = "/shops";
+                $Notification->Type = "1";
+                $Notification->Image = "fa-store";
+                $Notification->IsRead = "0";
+                $Notification->NotificationText = $this->ShopName . " Requested to Approve.";
+                $Notification->CreatedOn = date('Y-m-d H:i:s');
+                $Notification->AddNotification();
                 return '{"key":"true"}';
                 
             }
@@ -185,34 +171,7 @@ class Shops {
             $websitestmt = $this->conn->prepare($query);
             $websitestmt->execute();
             $websitedata = $websitestmt->fetch(PDO::FETCH_ASSOC);
-            $mail = new PHPMailer();
-
-            // set mailer to use SMTP
-            $mail->IsSMTP();
-
-            // As this email.php script lives on the same server as our email server
-            // we are setting the HOST to localhost
-            $mail->Host = "smtp.gmail.com";  // specify main and backup server
-
-            $mail->SMTPAuth = true;     // turn on SMTP authentication
-            $mail->Port=465;
-            $mail->SMTPSecure = "ssl";
-            // When sending email using PHPMailer, you need to send from a valid email address
-            // In this case, we setup a test email account with the following credentials:
-            // email: send_from_PHPMailer@bradm.inmotiontesting.com
-            // pass: password
-            if(!isset($websitedata['Email']) || !isset($websitedata['Password']))
-                return "0";
-
-            $mail->Username = $websitedata['Email'];  // SMTP username
-            $mail->Password = $websitedata['Password']; // SMTP password
-
-            // $email is the user's email address the specified
-            // on our contact us page. We set this variable at
-            // the top of this page with:
-            // $email = $_REQUEST['email'] ;
-            $mail->From = $websitedata['Email'] ;
-            $mail->FromName = $websitedata['Name'] ;
+            $mail = new SendMail();
 
             // Random String
             do{
@@ -225,12 +184,7 @@ class Shops {
             }while($stmt->rowcount()>0);
 
             $randompassword = $this->randompassword(8);
-            // below we want to set the email address we will be sending our email to.
-            $mail->AddAddress($Email);
-
-
-            $mail->IsHTML(true);
-
+      
             $mail->Subject = "Welcome To" . $websitedata['Name'] ;
             $message = '<h1>Hello ' . $this->OwnerName . ',</h1>';
             $message .= '<p>Welcome to ' . $websitedata['Name'] . '</p>';
@@ -239,16 +193,8 @@ class Shops {
             $message .= '<p> Password : <b>' . $randompassword . '</b> </p>';
             $message .= '<p><a href="http://localhost:4200/login">Click Here To Login</a></p>';
 
-            
 
-            // $message is the user's message they typed in
-            // on our contact us page. We set this variable at
-            // the top of this page with:
-            // $message = $_REQUEST['message'] ;
-            $mail->Body    = $message;
-            $mail->AltBody = $message;
-
-            if(!$mail->Send())
+            if(!$mail->send($Email,$Subject,$message))
             {
                 return '{"key":"Error: ' . $mail->ErrorInfo . '"}';
 
@@ -634,7 +580,6 @@ class Shops {
         $stmt->execute();
         return $stmt;
     }
-    
     
 }
 ?>

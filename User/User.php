@@ -1,8 +1,7 @@
 <?php
 
 include_once '../config/database.php';
-require("../phpmailer/Mailer/PHPMailer_5.2.0/class.PHPMailer.php");
-
+require_once '../Notification/Notification.php';
 
 class User {
  
@@ -66,8 +65,18 @@ class User {
         $stmt->bindparam(":Name",$this->Name);
         $stmt->bindparam(":CreatedOn",$this->CreatedOn);
         $stmt->bindparam(":IsActive",$this->IsActive);
-        if($stmt->execute())
+        if($stmt->execute()){
+            $Notification = new Notification($this->conn);
+            $Notification->URL = "/userdata";
+            $Notification->Type = "1";
+            $Notification->Image = "fa-user";
+            $Notification->IsRead = "0";
+            $Notification->NotificationText = $this->Name . " Joined.";
+            $Notification->CreatedOn = date('Y-m-d H:i:s');
+            $Notification->AddNotification();
             return true;
+        }
+            
         return false;
     }
 
@@ -81,11 +90,11 @@ class User {
     }
 
     function CheckLogin($Username,$Password){
-        $query = "SELECT * FROM tbluser WHERE PhoneNo=:PhoneNo OR Email=:Email AND Password=:Password AND IsActive=1";
+        $query = "SELECT * FROM tbluser WHERE (PhoneNo=:PhoneNo OR Email=:Email) AND Password=:Password AND IsActive=1";
         $stmt = $this->conn->prepare($query);
-        $stmt->bindparam(":PhoneNo",$this->$Username);
-        $stmt->bindparam(":Email",$this->$Username);
-        $stmt->bindparam(":Password",$this->$Password);
+        $stmt->bindparam(":PhoneNo",$Username);
+        $stmt->bindparam(":Email",$Username);
+        $stmt->bindparam(":Password",$Password);
         $stmt->execute();
         return $stmt;
     }
