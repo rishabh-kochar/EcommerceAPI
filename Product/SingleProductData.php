@@ -37,7 +37,7 @@ if($num>0){
             array_push($image_arr, $image_item);
         }
 
-        $query = "SELECT * FROM tbldiscount WHERE ProdID=:id";
+        $query = "SELECT * FROM tbldiscount WHERE ProdID=:id AND IsActive=1";
         $stmt1 = $db->prepare($query);
         $stmt1->bindparam(":id",$ProductId);
         $stmt1->execute();
@@ -105,7 +105,6 @@ if($num>0){
                     $properties_item["IsFilter"]=$IsFilter;
                     $properties_item["PropertyName"]=$PropertyName;
                     $properties_item["Value"]=$value;
-                
             
                     array_push($properties, $properties_item);
                 }

@@ -1,7 +1,7 @@
 <?php
 
 include_once '../config/database.php';
-include_once './Shops.php';
+include_once './User.php';
 
 $database = new Database();
 $db = $database->getConnection();
@@ -15,7 +15,7 @@ $username = $data->Email;
 //$username = "rishabhkochar58@gmail.com";
 //$password = "rishabh";
 
-$stmt = $User->SameUsername($username);
+$stmt = $User->CheckEmail($username);
 $num = $stmt->rowCount();
 
 if($num>0)

@@ -385,9 +385,7 @@ class Category {
                 $stmt->bindparam(":Value",$this->value);
                 if(!$stmt->execute())
                     $j=1;
-            
-            
-           
+            }
             }
         }
 
