@@ -40,6 +40,25 @@ if($num>0){
             array_push($image_arr, $image_item);
             $i++;
         }
+
+        $query = "SELECT * FROM tbldiscount WHERE ProdID=:id AND IsActive=1";
+        $stmt1 = $db->prepare($query);
+        $stmt1->bindparam(":id",$ProductId);
+        $stmt1->execute();
+        //echo $ProductId;
+
+        $num = $stmt1->rowcount();
+        if($num>0){
+            $DiscountData = $stmt1->fetch(PDO::FETCH_ASSOC);
+            if(isset($DiscountData['Flat'])){
+                $Price = $Price - $DiscountData['Flat'];
+            }
+               
+            if(isset($DiscountData['Percentage'])){
+                $Price = $Price - ($Price * $DiscountData['Percentage'])/100;
+            }
+                
+        }
  
  
         $shop_item=array(

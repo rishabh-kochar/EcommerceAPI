@@ -253,6 +253,16 @@ class Product {
         return $stmt;
     }
 
+    function GetCategoryProduct($id){
+        $query = "SELECT * FROM tblproduct p
+                    LEFT JOIN tblcategory c on p.CategoryID = c.CategoryID
+                     WHERE p.CategoryID=:id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindparam(":id",$id);
+        $stmt->execute();
+        return $stmt;
+    }
+
 
 }
 ?>

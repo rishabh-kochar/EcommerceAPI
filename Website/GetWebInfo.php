@@ -42,7 +42,8 @@ if($num>0){
         "LastUpdatedOn" => $LastUpdatedOn,
         "TagLine" => $TagLine,
         "Logo" => $Logo,
-        "LogoAlt" => $LogoAlt
+        "LogoAlt" => $LogoAlt,
+        "Email" => $Email
 
     );
         
