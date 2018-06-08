@@ -81,9 +81,9 @@ class User {
     }
 
     function UserData($id){
-        $query = "SELCT * FROM tbluser WHERE UserID=:id";
+        $query = "SELECT * FROM tbluser WHERE UserID=:id";
         $stmt = $this->conn->prepare($query);
-        $stmt->bindparam(":id",$this->$id);
+        $stmt->bindparam(":id",$id);
         $stmt->execute();
         return $stmt;
 
@@ -120,7 +120,7 @@ class User {
         $query = "SELECT * FROM " . $this->table_name . " WHERE  
                     Email = :Username OR PhoneNo = :Username"; 
         $stmt = $this->conn->prepare($query);
-        $stmt->bindparam(":Username",$userName)
+        $stmt->bindparam(":Username",$userName);
         $stmt->execute();
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         
@@ -140,8 +140,8 @@ class User {
 
                     $randomString = $this->randompassword(10);
                     $query = "UPDATE " . $this->table_name . " SET RandomString = '" . $randomString ."', 
-                                RandomStringTime = '" . date('Y-m-d H:i:s') . "' WHERE Email = '" . $username . "' OR 
-                                PhoneNo = '" . $username . "'";
+                                RandomStringTime = '" . date('Y-m-d H:i:s') . "' WHERE Email = '" . $userName . "' OR 
+                                PhoneNo = '" . $userName . "'";
                     //echo $query;
                     $stmt = $this->conn->prepare($query);
 
@@ -163,7 +163,7 @@ class User {
                 return "0";
     
                 }else{
-                    $query = "UPDATE " . $this->table_name . " SET VerificationCode = '" . $generatedPassword ."' WHERE Email = '" . $username . "'"; 
+                    $query = "UPDATE " . $this->table_name . " SET VerificationCode = '" . $generatedPassword ."' WHERE Email = '" . $userName . "'"; 
                 $stmt = $this->conn->prepare($query);
                 $stmt->execute();
 
@@ -266,6 +266,12 @@ class User {
         }else{
             return '{ "key" : "incorrect" }';
         }
+    }
+
+    function randompassword( $length ) {
+        $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        $password = substr( str_shuffle( $chars ), 0, $length );
+        return $password;
     }
 
 

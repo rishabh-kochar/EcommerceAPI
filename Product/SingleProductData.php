@@ -37,6 +37,38 @@ if($num>0){
             array_push($image_arr, $image_item);
         }
 
+        $query = "SELECT * FROM tbldiscount WHERE ProdID=:id";
+        $stmt1 = $db->prepare($query);
+        $stmt1->bindparam(":id",$ProductId);
+        $stmt1->execute();
+        //echo $ProductId;
+
+        $num = $stmt1->rowcount();
+        if($num>0){
+            $DiscountData = $stmt1->fetch(PDO::FETCH_ASSOC);
+            if(isset($DiscountData['Flat'])){
+                $discount_arr = array(
+                    "Type" => "1",
+                    "Flat" =>  $DiscountData['Flat']
+                );
+                $finalPrice = $Price - $DiscountData['Flat'];
+            }
+               
+            if(isset($DiscountData['Percentage'])){
+                $discount_arr = array(
+                    "Type" => "2",
+                    "Percentage" =>  $DiscountData['Percentage']
+                );
+                $finalPrice = $Price - ($Price * $DiscountData['Percentage'])/100;
+            }
+                
+        }else{
+            $discount_arr = null;
+            $finalPrice = 0;
+        }
+        
+        
+
         //Properties
         $query = "SELECT * FROM tblcategoryproperties WHERE CategoryID=:id ORDER BY ColumnOrder";
         $stmt = $db->prepare($query);
@@ -104,7 +136,9 @@ if($num>0){
             "CreatedOn" => $CreatedOn,
             "LastUpdatedOn" => $LastUpdatedOn,
             "image" => $image_arr,
-            "Properties" => $properties
+            "Properties" => $properties,
+            "Discount" => $discount_arr,
+            "FinalPrice" => $finalPrice
            
 
         );
