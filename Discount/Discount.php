@@ -4,6 +4,7 @@ include_once '../config/database.php';
 include_once '../phpmailer/Mailer/Mail.php';
 
 
+
 class Discount {
  
     // database connection and table name
@@ -15,32 +16,36 @@ class Discount {
     public $Flat;
     public $Percentage;
     public $IsActive;
+    public $CreatedOn;
+    public $UpdatedOn;
 
     public function __construct($db){
         $this->conn = $db;
     }
 
-    function AddDiscount(){
+    function AddDiscount($id){
 
-        $id = $this->ProdID;
         if($id == "new"){
-            $query = "INSERT INTO tbldiscount(ProdID,Flat,Percentage,IsActive)
-                    VALUES(:ProdID,:Flat,:Percentage,:IsActive)";
+            $query = "INSERT INTO tbldiscount(ProdID,Flat,Percentage,IsActive,CreatedOn)
+                    VALUES(:ProdID,:Flat,:Percentage,:IsActive,:CreatedOn)";
             $stmt = $this->conn->prepare($query);
             $stmt->bindparam(":ProdID",$this->ProdID);
             $stmt->bindparam(":Flat",$this->Flat);
             $stmt->bindparam(":Percentage",$this->Percentage);
             $stmt->bindparam(":IsActive",$this->IsActive);
+            $stmt->bindparam(":CreatedOn",$this->CreatedOn);
             if($stmt->execute())
                 return true;
             return false;
         }else{
-            $query = "UPDATE tbldiscount SET Flat=:Flat, Percentage=:Percentage, IsActive=:IsActive WHERE ProdID=:ProdID";
+            $query = "UPDATE tbldiscount SET Flat=:Flat, Percentage=:Percentage, IsActive=:IsActive,
+                        UpdatedOn=:UpdatedOn WHERE ProdID=:ProdID";
             $stmt = $this->conn->prepare($query);
             $stmt->bindparam(":ProdID",$this->ProdID);
             $stmt->bindparam(":Flat",$this->Flat);
             $stmt->bindparam(":Percentage",$this->Percentage);
             $stmt->bindparam(":IsActive",$this->IsActive);
+            $stmt->bindparam(":UpdatedOn",$this->UpdatedOn);
             if($stmt->execute())
                 return true;
             return false;
@@ -49,7 +54,7 @@ class Discount {
     }
 
     function GetAllShopDiscount($ShopID){
-        $query = "SELECT * FROM tbldiscont d
+        $query = "SELECT *,d.IsActive DiscountStatus FROM tbldiscount d
                     LEFT JOIN tblProduct as p on d.ProdID = p.ProductID
                     WHERE p.ShopID =:id";
         $stmt = $this->conn->prepare($query);
@@ -59,7 +64,7 @@ class Discount {
     }
 
     function getSingleProductDiscount($ProductID){
-        $query = "SELECT * FROM tbldiscont d
+        $query = "SELECT *,d.IsActive DiscountStatus FROM tbldiscount d
                     LEFT JOIN tblProduct as p on d.ProdID = p.ProductID
                     WHERE d.ProdID =:id";
         $stmt = $this->conn->prepare($query);

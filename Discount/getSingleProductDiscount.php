@@ -17,17 +17,18 @@ $stmt = $Discount->getSingleProductDiscount($id);
 $num = $stmt->rowcount();
 if($num>0){
 
-    $shop_arr=array();
-    $row = $stmt->fetch(PDO::FETCH_ASSOC)
+  
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
         
         extract($row);
-        $shop_item=array(
+        $shop_arr=array(
+            "key" => "true",
             "ProductID" => $ProdID,
-            "ProducrName" => $ProductName,
+            "ProductName" => $ProductName,
             "Price" => $Price,
             "Flat" => $Flat,
             "Percentage" => $Percentage,
-            "IsActive" => $IsActive
+            "IsActive" => $DiscountStatus
         );
  
  

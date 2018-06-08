@@ -233,6 +233,26 @@ class Product {
         return false;   
     }
 
+    function DiscountProduct($id){
+        $query = "SELECT * From tblproduct P, tbldiscount d WHERE P.ProductId = d.ProdID";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        $num = $stmt->rowcount();
+        if($num>0){
+            $query = "SELECT * FROM tblproduct p WHERE p.ProductId NOT IN( SELECT P.ProductId From tblproduct P, tbldiscount d 
+                        WHERE P.ProductId = d.ProdID AND p.ShopID=:id AND p.IsApproved=1) AND p.ShopID=:id AND p.IsApproved=1;";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindparam(":id",$id);
+            $stmt->execute();
+        }else{
+            $query = "SELECT * FROM tblproduct p WHERE p.ShopID=:id AND p.IsApproved=1";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindparam(":id",$id);
+            $stmt->execute();
+        }
+        return $stmt;
+    }
+
 
 }
 ?>

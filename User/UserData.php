@@ -12,7 +12,7 @@ $User = new User($db);
  
 $id = $_GET['id'];
 
-$stmt = $Shops->UserData($id);
+$stmt = $User->UserData($id);
 $num = $stmt->rowcount();
 if($num>0){
 
