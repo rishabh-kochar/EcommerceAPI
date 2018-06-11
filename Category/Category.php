@@ -386,7 +386,6 @@ class Category {
                 if(!$stmt->execute())
                     $j=1;
             }
-            }
         }
 
         if($j==0)
