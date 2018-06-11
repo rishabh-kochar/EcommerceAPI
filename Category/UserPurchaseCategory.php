@@ -1,14 +1,16 @@
 <?php
 
 include_once '../config/database.php';
-include_once './User.php';
+include_once './Category.php';
 
 $database = new Database();
 $db = $database->getConnection();
 
-$User = new User($db);
+$Category = new Category($db);
 
-$stmt = $User->AllUserData();
+//$data = json_decode(file_get_contents("php://input"));
+
+$stmt = $Category->ShopAllCategory();
 $num = $stmt->rowCount();
  //echo $num;
 // check if more than 0 record found
@@ -22,14 +24,12 @@ if($num>0){
         extract($row);
  
         $shop_item=array(
-            "UserID" => $UserID,
-            "PhoneNO" => $PhoneNo,
-            "Email" => $Email,
-            "Gender" => $Gender,
-            "Name" => $Name,
-            "CreatedOn" => $CreatedOn,
-            "IsActive" => $IsActive,
-            "ProfileImage" => $ProfileImage
+            "CategoryID" => $CategoryId,
+            "CategoryName" => $CategoryName,
+            "CategoryDesc" => $CategoryDesc,
+            "CategoryImage" => $CategoryImage,
+            "CategoryImageAlt" => $CategoryImageAlt
+
         );
  
         array_push($shop_arr["records"], $shop_item);

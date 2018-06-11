@@ -13,15 +13,17 @@ $Product = new Product($db);
 $id = $_GET['id'];
 //$id = 1;
 
-$stmt = $Product->SingleProductData($id);
+$stmt = $Product->GetCategoryProduct($id);
 $num = $stmt->rowCount();
  //echo $num;
 // check if more than 0 record found
 if($num>0){
+
+    $shop_arr=array();
+    $shop_arr["records"]=array();
  
  
-    $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        
+    while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
         extract($row);
         $query = "SELECT * FROM tblproductimage WHERE ProductID=:id";
         $stmt1 = $db->prepare($query);
@@ -105,6 +107,7 @@ if($num>0){
                     $properties_item["IsFilter"]=$IsFilter;
                     $properties_item["PropertyName"]=$PropertyName;
                     $properties_item["Value"]=$value;
+                
             
                     array_push($properties, $properties_item);
                 }
@@ -118,7 +121,7 @@ if($num>0){
             $IsActive = "Yes";
         else
             $IsActive = "No";
-        $shop_arr=array(
+        $shop_item=array(
             "ProductID" => $ProductId,
             "CategoryID" => $CategoryId,
             "ProductName" => $ProductName,
@@ -142,6 +145,11 @@ if($num>0){
 
         );
 
+        array_push($shop_arr["records"], $shop_item);
+
+    }
+        
+       
     
  
     echo json_encode($shop_arr);

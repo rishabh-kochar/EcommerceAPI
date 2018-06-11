@@ -12,12 +12,11 @@ $data = json_decode(file_get_contents("php://input"));
  
 $id = $data->ProductID;
 $property = ($data->FormValues);
-$operation = $data->operation;
 
 //echo $id;
 //print_r($property);
 
-$res = $Category->AddPropertyValue($operation,$id,$property);
+$res = $Category->AddPropertyValue($id,$property);
 
 if($res)
     echo '{"key":"true"}';

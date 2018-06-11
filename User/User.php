@@ -19,6 +19,7 @@ class User {
     public $IsActive;
     public $VerificationCode;
     public $Password;
+    public $ProfileImage;
 
     //Address Details
     public $AddressID;
@@ -273,6 +274,128 @@ class User {
         $password = substr( str_shuffle( $chars ), 0, $length );
         return $password;
     }
+
+    function ViewAllAddress($id){
+        $query = "SELECT * FROM tbladdress WHERE UserID=:id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindparam(":id",$id);
+        $stmt->execute();
+        return $stmt;
+    }
+
+    function ViewSingleAddress($id){
+        $query = "SELECT * FROM tbladdress WHERE AddressID=:id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindparam(":id",$id);
+        $stmt->execute();
+        return $stmt;
+    }
+
+    function AddAddress(){
+        $id = $this->AddressID;
+        if($id == "new"){
+            $query = "INSERT INTO tbladdress(UserID, Name, PhoneNo, Pincode, Locality, Address, 
+                        City, State, Landmark, Country, AddressType, IsActive, CreatedOn) 
+                            VALUES (:UserID,:Name,:PhoneNo,:Pincode,:Locality,:Address,
+                            :City,:State,:Landmark,:Country,:AddressType,:IsActive,:CreatedOn)";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindparam(":UserID",$this->UserID);
+            $stmt->bindparam(":Name",$this->AddressName);
+            $stmt->bindparam(":PhoneNo",$this->AddressPhoneNo);
+            $stmt->bindparam(":Pincode",$this->Pincode);
+            $stmt->bindparam(":Locality",$this->Locality);
+            $stmt->bindparam(":Address",$this->Address);
+            $stmt->bindparam(":City",$this->City);
+            $stmt->bindparam(":State",$this->State);
+            $stmt->bindparam(":Landmark",$this->Landmark);
+            $stmt->bindparam(":Country",$this->Country);
+            $stmt->bindparam(":AddressType",$this->AddressType);
+            $stmt->bindparam(":IsActive",$this->IsActive);
+            $stmt->bindparam(":CreatedOn",$this->CreatedOn);
+            if($stmt->execute())
+                return true;
+            return false;
+
+        }else{
+            $query = "UPDATE tbladdress UserID=:UserID, Name=:Name, PhoneNo=:PhoneNo, Pincode=:Pincode, 
+                        Locality=:Locality, Address=:Address, 
+                        City=:City, State=:State, Landmark=:Landmark, Country=:Country, AddressType=:AddressType
+                          WHERE AddressID=:id";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindparam(":id",$id);
+            $stmt->bindparam(":UserID",$this->UserID);
+            $stmt->bindparam(":Name",$this->AddressName);
+            $stmt->bindparam(":PhoneNo",$this->AddressPhoneNo);
+            $stmt->bindparam(":Pincode",$this->Pincode);
+            $stmt->bindparam(":Locality",$this->Locality);
+            $stmt->bindparam(":Address",$this->Address);
+            $stmt->bindparam(":City",$this->City);
+            $stmt->bindparam(":State",$this->State);
+            $stmt->bindparam(":Landmark",$this->Landmark);
+            $stmt->bindparam(":Country",$this->Country);
+            $stmt->bindparam(":AddressType",$this->AddressType);
+          
+            if($stmt->execute())
+                return true;
+            return false;
+        }
+    }
+
+    function UserImageUpdate(){
+
+        $query = "UPDATE " . $this->table_name . " SET ProfileImage=:Adminimage WHERE UserID=:id";
+     
+        //echo $query;
+        // prepare query
+        $stmt = $this->conn->prepare($query);
+     
+        // sanitize
+        $this->ProfileImage=htmlspecialchars(strip_tags($this->ProfileImage));
+        
+        // bind values
+        $stmt->bindParam(":Adminimage", $this->ProfileImage);
+        $stmt->bindParam(":id", $this->UserID);
+        
+     
+        // execute query
+        if($stmt->execute()){
+            return true;
+        }
+        return false;
+
+    }
+
+    function UpdateProfile(){
+        $query = "UPDATE tbluser SET Email=:Email, PhoneNo=:PhoneNo, Gender=:Gender, Name=:Name 
+                    WHERE UserID=:id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":Email", $this->Email);
+        $stmt->bindParam(":PhoneNo", $this->PhoneNo);
+        $stmt->bindParam(":Gender", $this->Gender);
+        $stmt->bindParam(":Name", $this->Name);
+        $stmt->bindParam(":id", $this->UserID);
+        if($stmt->execute()){
+            return true;
+        }
+        return false;
+    }
+
+    function CheckEmail($Username){
+        $query = "SELECT * FROM tbluser WHERE Email=:Username";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindparam(":Username",$Username);
+        $stmt->execute();
+        return $stmt;
+    }
+
+    function CheckPhoneNo($Username){
+        $query = "SELECT * FROM tbluser WHERE PhoneNo=:Username";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindparam(":Username",$Username);
+        $stmt->execute();
+        return $stmt;
+    }
+   
 
 
 

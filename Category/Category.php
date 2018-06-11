@@ -320,22 +320,25 @@ class Category {
                             $value = "";
                         }
                     }
+
+                    if($flag == 1)
+                        $operation = "new";
+                    else
+                        $operation = "update";
                     
                     $PropertyWithoutSpace = str_replace(' ', '', $PropertyName);
                     $shop_item=array(
                         "CategoryPropertyId" => $CategoryPropertyID,
                         "PropertyName" => $PropertyName,
                         "ID" => $PropertyWithoutSpace,
-                        "Value" => $value
+                        "Value" => $value,
+                        "Operation" => $operation
                     );
             
                     array_push($shop_arr["records"], $shop_item);
                 }
                 
-                if($flag == 1)
-                    $shop_arr["operation"] = "new";
-                else
-                    $shop_arr["operation"] = "update";
+               
 
                 return json_encode($shop_arr);
             
@@ -349,14 +352,15 @@ class Category {
 
     }
 
-    function AddPropertyValue($operation,$id,$property){
+    function AddPropertyValue($id,$property){
 
         $this->ProductID = $id;
         $size = sizeof($property);
-        //echo $size;
-        if($operation == "new"){
-                $j=0;
-                for($i=0;$i<$size;$i++){
+        $j=0;
+
+        for($i=0;$i<$size;$i++){
+            $operation = $property[$i]->Operation;
+            if($operation == "new"){
                     $this->CategoryPropertyID = $property[$i]->ID;
                     $this->value = $property[$i]->Value;
                     $query = "INSERT INTO tblcategorypropertiesvalues(ProductID,CategoryPropertyID,Value) 
@@ -367,31 +371,35 @@ class Category {
                     $stmt->bindparam(":Value",$this->value);
                     if(!$stmt->execute())
                         $j=1;
-                }
                 
-                if($j==0)
-                    return true;
-                return false;
-        } else{
-                 $j=0;
-                for($i=0;$i<$size;$i++){
-                    $this->CategoryPropertyID = $property[$i]->ID;
-                    $this->value = $property[$i]->Value;
-                    $query = "UPDATE tblcategorypropertiesvalues SET Value=:Value 
-                                WHERE ProductID=:ProductID AND CategoryPropertyID=:CategoryPropertyID";
-                    $stmt = $this->conn->prepare($query);
-                    $stmt->bindparam(":ProductID",$this->ProductID);
-                    $stmt->bindparam(":CategoryPropertyID",$this->CategoryPropertyID);
-                    $stmt->bindparam(":Value",$this->value);
-                    if(!$stmt->execute())
-                        $j=1;
-                }
                 
-                if($j==0)
-                    return true;
-                return false;
+                
+            }else{
+                $this->CategoryPropertyID = $property[$i]->ID;
+                $this->value = $property[$i]->Value;
+                $query = "UPDATE tblcategorypropertiesvalues SET Value=:Value 
+                            WHERE ProductID=:ProductID AND CategoryPropertyID=:CategoryPropertyID";
+                $stmt = $this->conn->prepare($query);
+                $stmt->bindparam(":ProductID",$this->ProductID);
+                $stmt->bindparam(":CategoryPropertyID",$this->CategoryPropertyID);
+                $stmt->bindparam(":Value",$this->value);
+                if(!$stmt->execute())
+                    $j=1;
+            }
+            }
         }
+
+        if($j==0)
+            return true;
+        return false;
             
+    }
+
+    function ShopAllCategory(){
+        $query= "SELECT * FROM tblcategory c ORDER BY c.CategoryName";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt;
     }
 
     

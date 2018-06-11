@@ -8,7 +8,9 @@ $db = $database->getConnection();
 
 $User = new User($db);
 
-$stmt = $User->AllUserData();
+$id = $_GET['id'];
+
+$stmt = $User->ViewAllAddress($id);
 $num = $stmt->rowCount();
  //echo $num;
 // check if more than 0 record found
@@ -22,14 +24,19 @@ if($num>0){
         extract($row);
  
         $shop_item=array(
+            "AddressID" => $AddressID,
             "UserID" => $UserID,
-            "PhoneNO" => $PhoneNo,
-            "Email" => $Email,
-            "Gender" => $Gender,
-            "Name" => $Name,
-            "CreatedOn" => $CreatedOn,
-            "IsActive" => $IsActive,
-            "ProfileImage" => $ProfileImage
+            "AddressName" => $Name,
+            "AddressPhoneNo" => $PhoneNo,
+            "Pincode" => $Pincode,
+            "Locality" => $Locality,
+            "Address" => $Address,
+            "City" => $City,
+            "State" => $State,
+            "LandMark" => $Landmark,
+            "Country" => $Country,
+            "AddressType" => $AddressType
+           
         );
  
         array_push($shop_arr["records"], $shop_item);
@@ -39,7 +46,7 @@ if($num>0){
 }
  
 else{
-    echo '{"key":"false"}';
+    echo '{"key":"true"}';
 }
 
 ?>
