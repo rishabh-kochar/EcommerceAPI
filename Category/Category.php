@@ -73,7 +73,7 @@ class Category {
                 $id = $this->conn->lastInsertId();
                 $Notification = new Notification($this->conn);
                 $Notification->URL = "/sucategory";
-                $Notification->Type = "1";
+                $Notification->Type = "0";
                 $Notification->Image = "fa-list";
                 $Notification->IsRead = "0";
                 $Notification->NotificationText = $this->CategoryName . " Category Added.";

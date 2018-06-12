@@ -96,7 +96,7 @@ class Shops {
                     return '{"key":"Error: ' . $mail->ErrorInfo . '"}';
                 $Notification = new Notification($this->conn);
                 $Notification->URL = "/shops";
-                $Notification->Type = "1";
+                $Notification->Type = "0";
                 $Notification->Image = "fa-store";
                 $Notification->IsRead = "0";
                 $Notification->NotificationText = $this->ShopName . " Requested to Approve.";
@@ -219,7 +219,7 @@ class Shops {
         if( $stmt->execute()){
                 $Notification = new Notification($this->conn);
                 $Notification->URL = "/shopProfile";
-                $Notification->Type = "0";
+                $Notification->Type = $id;
                 $Notification->Image = "fa-handshake";
                 $Notification->IsRead = "0";
                 $Notification->NotificationText = "Welcome to " . $websitedata['Name'] . ".";

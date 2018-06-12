@@ -21,24 +21,45 @@ if($num>0){
         
         extract($row);
 
+        
         $query = "SELECT * FROM tblproductimage WHERE ProductID=:id LIMIT 1";
         $stmt1 = $db->prepare($query);
-        $stmt1->bindparam(":id",$ProdId);
+        $stmt1->bindparam(":id",$ProdID);
         $stmt1->execute();
         //echo $ProductId;
 
         $image_arr=array();
 
         $ImageData = $stmt1->fetch(PDO::FETCH_ASSOC);
+
+        $query = "SELECT * FROM tbldiscount WHERE ProdID=:id AND IsActive=1";
+        $stmt1 = $db->prepare($query);
+        $stmt1->bindparam(":id",$ProdID);
+        $stmt1->execute();
+        //echo $ProductId;
+
+        $num = $stmt1->rowcount();
+        if($num>0){
+            $DiscountData = $stmt1->fetch(PDO::FETCH_ASSOC);
+            if(isset($DiscountData['Flat'])){
+                $Price = $Price - $DiscountData['Flat'];
+            }
+               
+            if(isset($DiscountData['Percentage'])){
+                $Price = $Price - ($Price * $DiscountData['Percentage'])/100;
+            }
+                
+        }
        
         $shop_item=array(
           "CartID" => $CartID,
-          "ProductID" => $ProdId,
+          "ProductID" => $ProdID,
           "ProductName" => $ProductName,
           "Qty" => $Qty,
           "Price" => $Price,
           "AddedOn" => $AddedOn,
-          "Image" => $ImageData['Image']
+          "Image" => $ImageData['Image'],
+          "Stock" => $CurrentStock
         );
  
         array_push($shop_arr["records"], $shop_item);

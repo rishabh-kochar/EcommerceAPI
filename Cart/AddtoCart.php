@@ -13,7 +13,7 @@ $data = json_decode(file_get_contents("php://input"));
 
 $Cart->ProductID = $data->ProductID;
 $Cart->UserID = $data->UserID;
-$Cart->Qty = $data->Qty;
+$Cart->Qty = $data->Quantity;
 $Cart->AddedOn = date('Y-m-d H:i:s');
 //echo $stock;
 

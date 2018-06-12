@@ -10,14 +10,12 @@ $Cart = new Cart($db);
 
 $data = json_decode(file_get_contents("php://input"));
 
-$id = $data->id;
+$id = $data->UserID;
 $Addid = $data->AddressID;
+$Amt = $data->TotalAmount;
 
 
-$res = $Cart->CheckOut($id,$Addid);
-if($res)
-    echo '{"key":"true"}';
-else
-    echo '{"key":"false"}';
+$res = $Cart->CheckOut($id,$Addid,$Amt);
+echo $res;
 
 ?>

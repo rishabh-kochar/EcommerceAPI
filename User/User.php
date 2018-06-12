@@ -70,7 +70,7 @@ class User {
         if($stmt->execute()){
             $Notification = new Notification($this->conn);
             $Notification->URL = "/userdata";
-            $Notification->Type = "1";
+            $Notification->Type = "0";
             $Notification->Image = "fa-user";
             $Notification->IsRead = "0";
             $Notification->NotificationText = $this->Name . " Joined.";

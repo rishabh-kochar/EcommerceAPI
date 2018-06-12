@@ -9,9 +9,10 @@ $db = $database->getConnection();
 $Notification = new Notification($db);
  
 //$data = json_decode(file_get_contents("php://input"));
- 
 
-$stmt = $Notification->GetSellerNoti();
+$id = $_GET['id'];
+
+$stmt = $Notification->GetSellerNoti($id);
 $num = $stmt->rowcount();
 if($num>0){
 

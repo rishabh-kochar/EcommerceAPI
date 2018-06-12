@@ -10,8 +10,8 @@ $Cart = new Cart($db);
 
 $data = json_decode(file_get_contents("php://input"));
 
-$id = $data->ID;
-$qty = $data->qty;
+$id = $data->CartID;
+$qty = $data->Quantity;
 
 $res = $Cart->AddQty($id,$qty);
 if($res)
