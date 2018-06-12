@@ -73,18 +73,18 @@ if($num>0){
 
         //Properties
         $query = "SELECT * FROM tblcategoryproperties WHERE CategoryID=:id ORDER BY ColumnOrder";
-        $stmt = $db->prepare($query);
-        $stmt->bindparam(":id",$CategoryId);
-        $stmt->execute();
+        $stmt1 = $db->prepare($query);
+        $stmt1->bindparam(":id",$CategoryId);
+        $stmt1->execute();
         
-        $num = $stmt->rowCount();
+        $num = $stmt1->rowCount();
         //echo $num;
         // check if more than 0 record found
         $flag = 0;
         if($num>0){
                 $properties=array();
                 
-                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)){
+                while ($row = $stmt1->fetch(PDO::FETCH_ASSOC)){
                    
                     extract($row);
 

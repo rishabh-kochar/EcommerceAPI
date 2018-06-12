@@ -140,6 +140,21 @@ class Order {
         return $stmt;
     }
 
+    function GetUserOrders($id){
+        $query = "SELECT *,od.ProductID PID,o.UserID CID,od.Price PurchasedPrice FROM tblorderdetails od
+                    LEFT JOIN tblproduct as p on od.ProductID = p.ProductID
+                    LEFT JOIN tblcategory as c on p.CategoryID = c.CategoryID
+                    LEFT JOIN tblorders as o on od.OrderID = o.OrderID
+                    LEFT JOIN tblAddress as a on o.AddressID = a.AddressID
+                    LEFT JOIN tblshops as s on p.ShopID = s.ShopID
+                    WHERE o.UserID=:id
+                    ORDER BY OrderDetailID DESC";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindparam(":id",$id);
+        $stmt->execute();
+        return $stmt;
+    }
+
     
 }
 ?>

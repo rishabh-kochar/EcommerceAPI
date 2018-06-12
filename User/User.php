@@ -55,10 +55,10 @@ class User {
     }
 
     function UserSignUp(){
-        $query = "INSERT INTO tbluser(PhoneNo,Email,Password,Gender,Name,CreatedOn,IsActive)
-                    values(:PhoneNo,:Email,:Password,:Gender,:Name,:CreatedOn,:IsActive)";
+        $query = "INSERT INTO tbluser(PhoneNo,Email,Password,Gender,Name,CreatedOn,IsActive,ProfileImage)
+                    values(:PhoneNo,:Email,:Password,:Gender,:Name,:CreatedOn,:IsActive,:image)";
         $stmt = $this->conn->prepare($query);
-        
+        $image="index.png";
         $stmt->bindparam(":PhoneNo",$this->PhoneNo);
         $stmt->bindparam(":Email",$this->Email);
         $stmt->bindparam(":Password",$this->Password);
@@ -66,10 +66,11 @@ class User {
         $stmt->bindparam(":Name",$this->Name);
         $stmt->bindparam(":CreatedOn",$this->CreatedOn);
         $stmt->bindparam(":IsActive",$this->IsActive);
+        $stmt->bindparam(":image",$image);
         if($stmt->execute()){
             $Notification = new Notification($this->conn);
             $Notification->URL = "/userdata";
-            $Notification->Type = "1";
+            $Notification->Type = "0";
             $Notification->Image = "fa-user";
             $Notification->IsRead = "0";
             $Notification->NotificationText = $this->Name . " Joined.";
@@ -396,7 +397,23 @@ class User {
         return $stmt;
     }
    
-
+    function RemoveImage($id){
+        
+        $query = "UPDATE " . $this->table_name . " SET ProfileImage=:Adminimage WHERE UserID=:id";
+        $stmt = $this->conn->prepare($query);
+     
+        // sanitize
+        $this->ProfileImage="index.png";
+        
+        // bind values
+        $stmt->bindParam(":Adminimage", $this->ProfileImage);
+        $stmt->bindParam(":id", $id);
+        
+        if($stmt->execute()){
+            return true;
+        }
+        return false;
+    }
 
 
     

@@ -39,14 +39,6 @@ class Notification {
     }
 
     function GetSuperAdminNoti(){
-        $query = "SELECT * FROM tblnotification WHERE IsRead=0 AND Type=1";
-        $stmt = $this->conn->prepare($query);
-        $stmt->execute();
-        return $stmt;
-
-    }
-
-    function GetSellerNoti(){
         $query = "SELECT * FROM tblnotification WHERE IsRead=0 AND Type=0";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
@@ -54,11 +46,17 @@ class Notification {
 
     }
 
-    
+    function GetSellerNoti($id){
+        $query = "SELECT * FROM tblnotification WHERE IsRead=0 AND Type=:id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindparam(":id",$id);
+        $stmt->execute();
+        return $stmt;
+
+    }
 
     function ReadNotification($id){
         $query = "UPDATE tblnotification SET IsRead=1 WHERE NotificationID=:id";
-        //echo $query;
         $stmt = $this->conn->prepare($query);
         $stmt->bindparam(":id",$id);
         if($stmt->execute())
@@ -75,11 +73,6 @@ class Notification {
         return false;
     }
     
-
-
 }
-
-
-
 
 ?>

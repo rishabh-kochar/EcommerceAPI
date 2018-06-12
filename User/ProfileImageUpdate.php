@@ -48,7 +48,8 @@ if(isset($_FILES['image'])){
         if($stmt->rowcount()>0){
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             extract($row);
-            unlink($target_dir.$ProfileImage);
+            if($ProfileImage != "index.png")
+                unlink($target_dir.$ProfileImage);
         }
 
         $rand = date('YmdHis');

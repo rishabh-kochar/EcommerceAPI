@@ -40,7 +40,7 @@ class Feedback {
         if($stmt->execute()){
             $Notification = new Notification($this->conn);
                 $Notification->URL = "/feedback";
-                $Notification->Type = "1";
+                $Notification->Type = "0";
                 $Notification->Image = "fa-comments";
                 $Notification->IsRead = "0";
                 $Notification->NotificationText = $this->Name . " Added a query.";

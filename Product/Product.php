@@ -82,18 +82,19 @@ class Product {
          
         if($stmt->execute()){
             if($id == "new"){
+                $id = $this->conn->lastInsertId();
                 $Notification = new Notification($this->conn);
                 $Notification->URL = "/suproduct";
-                $Notification->Type = "1";
+                $Notification->Type = "0";
                 $Notification->Image = "fa-gift";
                 $Notification->IsRead = "0";
                 $Notification->NotificationText = $this->ProductName . " Product Added.";
                 $Notification->CreatedOn = date('Y-m-d H:i:s');
                 $Notification->AddNotification();
-                $id = $this->conn->lastInsertId();
+               
             }
                
-                return $id;
+            return $id;
         }
      
         return null;
@@ -154,7 +155,7 @@ class Product {
         $row = $res->fetch(PDO::FETCH_ASSOC);
         
         //echo $row['MinStock'] . "<" . ($row['CurrentStock'] + $stock); 
-        if($row['MinStock'] < ($row['CurrentStock'] + $stock))
+        if($row['MinStock'] > ($row['CurrentStock'] + $stock))
             return false;
         //echo $row['ProductName'];
         //echo $row['CurrentStock'];
