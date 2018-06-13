@@ -9,17 +9,14 @@ $db = $database->getConnection();
 $Order = new Order($db);
 $id = $_GET['id'];
 
-$stmt = $Order->GetUserOrders($id);
+$stmt = $Order->SigleOrderDetail($id);
 $num = $stmt->rowCount();
  //echo $num;
 // check if more than 0 record found
 if($num>0){
  
-    $shop_arr=array();
-    $shop_arr["records"]=array();
- 
-    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)){
-        
+   
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
         extract($row);
 
         $query = "SELECT * FROM tbldiscount WHERE ProdID=:id AND IsActive=1";
@@ -62,14 +59,14 @@ if($num>0){
 
         $ImageData = $stmt1->fetch(PDO::FETCH_ASSOC);
 
+        
+        
         if($Status == 'Delievered'){
             $DelieveryDate = $OrderUpdatedOn;
         }else{
             $DelieveryDate = '';   
         }
 
-
- 
         $shop_item=array(
             "OrderID" => $OrderID,
           "ProductName" => $ProductName,
@@ -92,15 +89,13 @@ if($num>0){
             "Image" => $ImageData['Image'],
             "SellerName" => $ShopName,
             "OrderDate" => $OrderedOn,
-            "DelieveryDate" => $DelieveryDate,
-            "Status" => $Status
+            "DelieveryDate" => $DelieveryDate
 
         );
  
-        array_push($shop_arr["records"], $shop_item);
-    }
+        
  
-    echo json_encode($shop_arr);
+    echo json_encode($shop_item);
 }
  
 else{

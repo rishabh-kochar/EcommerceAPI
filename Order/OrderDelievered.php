@@ -10,9 +10,6 @@ $Order = new Order($db);
 
 $Order->OrderDetailsID = $_GET['id'];
 
-if($Order->OrderDelievered())
-    echo '{"key":"true"}';
-else
-    echo '{"key":"false"}';
-
+$res=$Order->OrderDelievered();
+echo $res;
 ?>
