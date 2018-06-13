@@ -257,7 +257,7 @@ class Product {
     function GetCategoryProduct($id){
         $query = "SELECT * FROM tblproduct p
                     LEFT JOIN tblcategory c on p.CategoryID = c.CategoryID
-                     WHERE p.CategoryID=:id";
+                     WHERE p.CategoryID=:id AND p.IsApproved=1 AND p.IsActive=1";
         $stmt = $this->conn->prepare($query);
         $stmt->bindparam(":id",$id);
         $stmt->execute();

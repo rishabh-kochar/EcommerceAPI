@@ -43,7 +43,7 @@ class Cart {
         $num = $stmt->rowcount();
         if($num>0){
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                $query = "UPDATE tblcart SET Qty=:qty WHERE CartID=:id";
+                $query = "UPDATE tblcart SET Qty=Qty+:qty WHERE CartID=:id";
                 $stmt = $this->conn->prepare($query);
                 $stmt->bindparam(":qty",$this->Qty);
                 $stmt->bindparam(":id",$row['CartID']);

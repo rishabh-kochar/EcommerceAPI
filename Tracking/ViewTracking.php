@@ -23,12 +23,14 @@ if($num>0){
  
     $shop_arr=array();
     $shop_arr["records"]=array();
- 
+    $i=1;
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)){
         
         extract($row);
- 
+        $ArrivedTime= $database->notification_time( $ArrivedTime);
+        $DispatchedTime= $database->notification_time( $DispatchedTime);
         $shop_item=array(
+            "No" => $i++,
           "TrackingID" => $TrackingID,
           "Text" => $TrackingText,
           "ArrivedTime" => $ArrivedTime,

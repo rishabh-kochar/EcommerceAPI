@@ -8,8 +8,8 @@ $db = $database->getConnection();
  
 $Order = new Order($db);
 
-$Order->OrderDetailsID = $_GET['id'];  
-$res=$Order->OrderShipped();
-echo $res;
+$Order->OrderDetailsID = $_GET['id'];
 
+$res=$Order->OutForDelivery();
+echo $res;
 ?>

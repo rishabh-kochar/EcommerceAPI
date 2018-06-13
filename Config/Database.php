@@ -40,6 +40,21 @@ class Database{
  
         return $this->conn;
     }
+
+    public function notification_time($d1){
+
+        $d1 = strtotime($d1);
+        $d2 = strtotime(date('Y-m-d H:i:s'));
+        $diff = ($d2 - $d1);
+        if($diff <= '60')
+            return round($diff,0) . " seconds ago.";
+        elseif($diff <= '3600')
+            return round($diff/60,0) . " minutes ago.";
+        elseif($diff <= '172800')
+            return round(($diff/60)/60,0) . " Hours ago.";
+        else
+            return round((($diff/60)/60)/60,0) . " days ago";
+    }
 }
 
 

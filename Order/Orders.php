@@ -39,7 +39,7 @@ class Order {
                     LEFT JOIN tblcategory as c on p.CategoryID = c.CategoryID
                     LEFT JOIN tblorders as o on od.OrderID = o.OrderID
                     LEFT JOIN tbluser as u on o.UserID = u.UserID
-                    LEFT JOIN tbladdress as a on u.UserID = a.UserID
+                    LEFT JOIN tbladdress as a on o.AddressID = a.AddressID
                     WHERE p.ShopID=:shopid
                     ORDER BY OrderDetailID DESC";
         $stmt = $this->conn->prepare($query);
@@ -49,15 +49,16 @@ class Order {
     }
 
     function OrderConfirm(){
+        $datetime = date('Y-m-d H:i:s');
         $status = "Confirmed";
-        $query = "UPDATE tblorderdetails SET status=:status WHERE OrderDetailID=:OrderDetailID";
+        $query = "UPDATE tblorderdetails SET OrderUpdatedOn=:OrderUpdatedOn, status=:status WHERE OrderDetailID=:OrderDetailID";
         $stmt = $this->conn->prepare($query);
         $stmt->bindparam(":status", $status);
+        $stmt->bindparam(":OrderUpdatedOn", $datetime);
         $stmt->bindparam(":OrderDetailID", $this->OrderDetailsID);
         if($stmt->execute()){
 
             $text = "Your Order has Been Confirmed By the Seller.";
-            $datetime = date('Y-m-d H:i:s');
             $query = "INSERT INTO tbltracking(OrderDetailsID,TrackingText,ArrivedTime,DispatchedTime,Status) 
                     values(:OrderDetailsID,:TrackingText,:ArrivedTime,:DispatchedTime,:Status);";
             $stmt = $this->conn->prepare($query);
@@ -74,56 +75,147 @@ class Order {
         return false;
     }
 
-    function OrderDelievered(){
-        $status = "Delievered";
-        $query = "UPDATE tblorderdetails SET status=:status WHERE OrderDetailID=:OrderDetailID";
+    function OutForDelivery(){
+        $datetime = date('Y-m-d H:i:s');
+        $query = "SELECT * FROM tblorderdetails WHERE OrderDetailID=:OrderDetailID AND Status='Shipped'";
         $stmt = $this->conn->prepare($query);
-        $stmt->bindparam(":status", $status);
         $stmt->bindparam(":OrderDetailID", $this->OrderDetailsID);
-        if($stmt->execute()){
+        $stmt->execute();
+        $num = $stmt->rowcount();
 
-            $text = "Your Order has Been Delieverd to your Address.";
-            $datetime = date('Y-m-d H:i:s');
-            $query = "INSERT INTO tbltracking(OrderDetailsID,TrackingText,ArrivedTime,DispatchedTime,Status) 
-                    values(:OrderDetailsID,:TrackingText,:ArrivedTime,:DispatchedTime,:Status);";
+        if($num == 1){
+            $status = "OFD";
+            $query = "UPDATE tblorderdetails SET OrderUpdatedOn=:OrderUpdatedOn, status=:status WHERE OrderDetailID=:OrderDetailID";
             $stmt = $this->conn->prepare($query);
-            $stmt->bindparam(":OrderDetailsID",$this->OrderDetailsID);
-            $stmt->bindparam(":TrackingText",$text);
-            $stmt->bindparam(":ArrivedTime",$datetime);
-            $stmt->bindparam(":DispatchedTime",$datetime);
-            $stmt->bindparam(":Status",$status);
+            $stmt->bindparam(":status", $status);
+            $stmt->bindparam(":OrderUpdatedOn", $datetime);
+            $stmt->bindparam(":OrderDetailID", $this->OrderDetailsID);
+            if($stmt->execute()){
+
+                $text = "Your Order has Been Out For Delivery to your Address.";
+                $query = "INSERT INTO tbltracking(OrderDetailsID,TrackingText,ArrivedTime,DispatchedTime,Status) 
+                        values(:OrderDetailsID,:TrackingText,:ArrivedTime,:DispatchedTime,:Status);";
+                $stmt = $this->conn->prepare($query);
+                $stmt->bindparam(":OrderDetailsID",$this->OrderDetailsID);
+                $stmt->bindparam(":TrackingText",$text);
+                $stmt->bindparam(":ArrivedTime",$datetime);
+                $stmt->bindparam(":DispatchedTime",$datetime);
+                $stmt->bindparam(":Status",$status);
 
 
-            $stmt->execute();
-            return true;
+                $stmt->execute();
+                return '{"key":"true"}';
+            }
+                
+            return '{"key":"false"}';
+        }else{
+            return '{"key":"noaccess"}';
         }
-            
-        return false;
+    }
+
+    function OrderDelievered(){
+
+        $datetime = date('Y-m-d H:i:s');
+        $query = "SELECT * FROM tblorderdetails WHERE OrderDetailID=:OrderDetailID AND Status='OFD'";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindparam(":OrderDetailID", $this->OrderDetailsID);
+        $stmt->execute();
+        $num = $stmt->rowcount();
+
+        if($num == 1){
+            $status = "Delievered";
+            $query = "UPDATE tblorderdetails SET OrderUpdatedOn=:OrderUpdatedOn, status=:status WHERE OrderDetailID=:OrderDetailID";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindparam(":status", $status);
+            $stmt->bindparam(":OrderUpdatedOn", $datetime);
+            $stmt->bindparam(":OrderDetailID", $this->OrderDetailsID);
+            if($stmt->execute()){
+
+                $text = "Your Order has Been Delieverd to your Address.";
+                $query = "INSERT INTO tbltracking(OrderDetailsID,TrackingText,ArrivedTime,DispatchedTime,Status) 
+                        values(:OrderDetailsID,:TrackingText,:ArrivedTime,:DispatchedTime,:Status);";
+                $stmt = $this->conn->prepare($query);
+                $stmt->bindparam(":OrderDetailsID",$this->OrderDetailsID);
+                $stmt->bindparam(":TrackingText",$text);
+                $stmt->bindparam(":ArrivedTime",$datetime);
+                $stmt->bindparam(":DispatchedTime",$datetime);
+                $stmt->bindparam(":Status",$status);
+
+
+                $stmt->execute();
+                return '{"key":"true"}';
+            }
+                
+            return '{"key":"false"}';
+        }else{
+            return '{"key":"noaccess"}';
+        }
     }
 
     function OrderShipped(){
-        $status = "Shipped";
-        $query = "UPDATE tblorderdetails SET status=:status WHERE OrderDetailID=:OrderDetailID";
+        $datetime = date('Y-m-d H:i:s');
+        $query = "SELECT * FROM tblorderdetails WHERE OrderDetailID=:OrderDetailID AND Status='Confirmed'";
         $stmt = $this->conn->prepare($query);
-        $stmt->bindparam(":status", $status);
         $stmt->bindparam(":OrderDetailID", $this->OrderDetailsID);
+        $stmt->execute();
+        $num = $stmt->rowcount();
 
-        if($stmt->execute()){
-            $text = "Your Order has Been Shipped for your Address.";
-            $datetime = date('Y-m-d H:i:s');
-            $query = "INSERT INTO tbltracking(OrderDetailsID,TrackingText,ArrivedTime,DispatchedTime,Status) 
-                    values(:OrderDetailsID,:TrackingText,:ArrivedTime,:DispatchedTime,:Status)";
-            $stmt->bindparam(":OrderDetailsID",$this->OrderDetailsID);
-            $stmt->bindparam(":TrackingText",$text);
-            $stmt->bindparam(":ArrivedTime",$datetime);
-            $stmt->bindparam(":DispatchedTime",$datetime);
-            $stmt->bindparam(":Status",$status);
+        if($num == 1){
+            $status = "Shipped";
+            $query = "UPDATE tblorderdetails SET OrderUpdatedOn=:OrderUpdatedOn, status=:status WHERE OrderDetailID=:OrderDetailID";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindparam(":status", $status);
+            $stmt->bindparam(":OrderUpdatedOn", $datetime);
+            $stmt->bindparam(":OrderDetailID", $this->OrderDetailsID);
 
-            $stmt->execute();
-            return true;
+            if($stmt->execute()){
+                $text = "Your Order has Been Shipped for your Address.";
+                $query = "INSERT INTO tbltracking(OrderDetailsID,TrackingText,ArrivedTime,DispatchedTime,Status) 
+                        values(:OrderDetailsID,:TrackingText,:ArrivedTime,:DispatchedTime,:Status)";
+                $stmt = $this->conn->prepare($query);
+                $stmt->bindparam(":OrderDetailsID",$this->OrderDetailsID);
+                $stmt->bindparam(":TrackingText",$text);
+                $stmt->bindparam(":ArrivedTime",$datetime);
+                $stmt->bindparam(":DispatchedTime",$datetime);
+                $stmt->bindparam(":Status",$status);
+
+                $stmt->execute();
+                return '{"key":"true"}';
+            }
+                
+            return '{"key":"false"}';
+        }else{
+            return '{"key":"noaccess"}';
         }
-            
-        return false;
+
+        
+    }
+
+    function OrderCancle(){
+        $status = "Cancelled";
+        $datetime = date('Y-m-d H:i:s');
+            $query = "UPDATE tblorderdetails SET OrderUpdatedOn=:OrderUpdatedOn, status=:status WHERE OrderDetailID=:OrderDetailID";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindparam(":status", $status);
+            $stmt->bindparam(":OrderUpdatedOn", $datetime);
+            $stmt->bindparam(":OrderDetailID", $this->OrderDetailsID);
+
+            if($stmt->execute()){
+                $text = "Order Cancelled.";
+                $query = "INSERT INTO tbltracking(OrderDetailsID,TrackingText,ArrivedTime,DispatchedTime,Status) 
+                        values(:OrderDetailsID,:TrackingText,:ArrivedTime,:DispatchedTime,:Status)";
+                $stmt = $this->conn->prepare($query);
+                $stmt->bindparam(":OrderDetailsID",$this->OrderDetailsID);
+                $stmt->bindparam(":TrackingText",$text);
+                $stmt->bindparam(":ArrivedTime",$datetime);
+                $stmt->bindparam(":DispatchedTime",$datetime);
+                $stmt->bindparam(":Status",$status);
+
+                $stmt->execute();
+                return '{"key":"true"}';
+            }
+                
+            return '{"key":"false"}';
     }
 
     function Allorder(){
@@ -132,7 +224,7 @@ class Order {
                     LEFT JOIN tblcategory as c on p.CategoryID = c.CategoryID
                     LEFT JOIN tblorders as o on od.OrderID = o.OrderID
                     LEFT JOIN tbluser as u on o.UserID = u.UserID
-                    LEFT JOIN tbladdress as a on u.UserID = a.UserID
+                    LEFT JOIN tbladdress as a on o.AddressID = a.AddressID
                     LEFT JOIN tblshops as s on p.ShopID = s.ShopID
                     ORDER BY OrderDetailID DESC";
         $stmt = $this->conn->prepare($query);
@@ -148,6 +240,21 @@ class Order {
                     LEFT JOIN tblAddress as a on o.AddressID = a.AddressID
                     LEFT JOIN tblshops as s on p.ShopID = s.ShopID
                     WHERE o.UserID=:id
+                    ORDER BY OrderDetailID DESC";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindparam(":id",$id);
+        $stmt->execute();
+        return $stmt;
+    }
+
+    function SigleOrderDetail($id){
+        $query = "SELECT *,od.ProductID PID,o.UserID CID,od.Price PurchasedPrice FROM tblorderdetails od
+                    LEFT JOIN tblproduct as p on od.ProductID = p.ProductID
+                    LEFT JOIN tblcategory as c on p.CategoryID = c.CategoryID
+                    LEFT JOIN tblorders as o on od.OrderID = o.OrderID
+                    LEFT JOIN tblAddress as a on o.AddressID = a.AddressID
+                    LEFT JOIN tblshops as s on p.ShopID = s.ShopID
+                    WHERE od.OrderDetailID=:id
                     ORDER BY OrderDetailID DESC";
         $stmt = $this->conn->prepare($query);
         $stmt->bindparam(":id",$id);
