@@ -370,10 +370,7 @@ class Category {
                     $stmt->bindparam(":CategoryPropertyID",$this->CategoryPropertyID);
                     $stmt->bindparam(":Value",$this->value);
                     if(!$stmt->execute())
-                        $j=1;
-                
-                
-                
+                        $j=1;  
             }else{
                 $this->CategoryPropertyID = $property[$i]->ID;
                 $this->value = $property[$i]->Value;

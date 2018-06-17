@@ -65,13 +65,13 @@ if(isset($_FILES['image'])){
             echo '{"key":"true"}';
         }
         else{
-            echo '{ "key" : "false" }';
+            echo '{ "key" : "1false" }';
         }
     }else{
-        echo '{ "key" : "false" }';
+        echo '{ "key" : "2false" }';
     }
  }else{
-    echo '{ "key" : "false" }';
+    echo '{ "key" : "3false" }';
  }
  
 

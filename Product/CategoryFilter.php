@@ -23,19 +23,25 @@ if($num>0){
     $shop_arr=array();
     $shop_arr["records"]=array();
 
-    $query = "SELECT max(Price) maxPrice,min(Price) minPrice FROM tblproduct p Where p.CategoryID = :id;";
+    $query = "SELECT max(Price) maxPrice,min(Price) minPrice FROM tblproduct p 
+                Where p.CategoryID = :id AND p.IsApproved=1 AND p.IsActive=1;;";
     $stmt1 = $db->prepare($query);
     $stmt1->bindparam(":id",$id);
     $stmt1->execute();
     $pricedata = $stmt1->fetch(PDO::FETCH_ASSOC);
     $shop_arr["Min"] = $pricedata['minPrice'];
-    $shop_arr["Max"] = $pricedata['maxPrice']+1000;
+    if($pricedata['minPrice'] != $pricedata['maxPrice'])
+        $shop_arr["Max"] = $pricedata['maxPrice']+1000;
+    else
+    $shop_arr["Max"] = $pricedata['maxPrice'];
  
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)){
         
         extract($row);
 
-        $query = "SELECT DISTINCT(Value) val From tblcategorypropertiesvalues c WHERE c.CategoryPropertyID = :id;";
+        $query = "SELECT DISTINCT(Value) val From tblcategorypropertiesvalues c
+                    LEFT JOIN tblproduct p on p.ProductID = c.ProductID
+                    WHERE c.CategoryPropertyID = :id AND p.IsApproved=1 AND p.IsActive=1;";
         $stmt1 = $db->prepare($query);
         $stmt1->bindparam(":id",$CategoryPropertyID);
         $stmt1->execute();
@@ -67,7 +73,19 @@ if($num>0){
 }
  
 else{
-    echo '{"key":"false"}';
+    $shop_arr=array();
+    $query = "SELECT max(Price) maxPrice,min(Price) minPrice FROM tblproduct p 
+                Where p.CategoryID = :id AND p.IsApproved=1 AND p.IsActive=1;;";
+    $stmt1 = $db->prepare($query);
+    $stmt1->bindparam(":id",$id);
+    $stmt1->execute();
+    $pricedata = $stmt1->fetch(PDO::FETCH_ASSOC);
+    $shop_arr["Min"] = $pricedata['minPrice'];
+    if($pricedata['minPrice'] != $pricedata['maxPrice'])
+        $shop_arr["Max"] = $pricedata['maxPrice']+1000;
+    else
+    $shop_arr["Max"] = $pricedata['maxPrice'];
+    echo json_encode($shop_arr);
 }
 
 ?>

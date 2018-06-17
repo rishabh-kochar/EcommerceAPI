@@ -444,6 +444,111 @@ class Product {
         }
     }
 
+    function ProductSearch($Search){
+        $query = "SELECT * FROM tblproduct p
+                    LEFT JOIN tblcategory c on p.CategoryID = c.CategoryID
+                     WHERE p.ProductName LIKE :name AND p.IsApproved=1 AND p.IsActive=1";
+        $stmt = $this->conn->prepare($query);
+        $Search = "%".$Search."%";
+        $stmt->bindparam(":name",$Search);
+        $stmt->execute();
+        return $stmt;
+    }
+
+    function MostSelledProduct(){
+        $query = "SELECT ProductID,count(*) cnt FROM tblorderdetails
+                    Group BY ProductID
+                    Order By cnt desc
+                    Limit 12";
+         $stmt = $this->conn->prepare($query);
+         $stmt->execute();
+         if($stmt->rowcount()>0){
+            $str = "";
+            while($row=$stmt->fetch(PDO::FETCH_ASSOC)){
+                $str .= $row['ProductID'] . ",";
+            }
+            $str .= "0";
+            //echo $query;
+            $query = "SELECT * FROM tblproduct p
+                        LEFT JOIN tblcategory c on p.CategoryID = c.CategoryID
+                        WHERE p.ProductID IN (" . $str ." ) AND p.IsApproved=1 AND p.IsActive=1";
+                        $stmt = $this->conn->prepare($query);
+                        //echo $query;
+                        $stmt->execute();
+                    return $stmt;
+         }else{
+            $query = "SELECT * FROM tblproduct p
+                        LEFT JOIN tblcategory c on p.CategoryID = c.CategoryID
+                        WHERE  p.IsApproved=1 AND p.IsActive=1
+                        ORDER BY p.ProductID DESC
+                        LIMIT 12";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindparam(":ids",$id);
+            $stmt->execute();
+            return $stmt;
+         }
+
+    }
+
+    function PercentageDiscountProduct(){
+
+
+        $query = "(SELECT Count(*) cnt FROM `tbldiscount` d 
+                    WHERE d.Flat IS NOT NULL and d.IsActive=1)";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        $Flat = $row['cnt'];
+
+        $query = "(SELECT Count(*) cnt FROM `tbldiscount` d 
+            WHERE d.Percentage IS NOT NULL and d.IsActive=1)";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        $Percentage = $row['cnt'];
+                    
+        
+
+        if($Flat>=2 && $Percentage>=2){
+            $query = "(SELECT * FROM tblproduct p
+                        LEFT JOIN tblcategory c on p.CategoryID = c.CategoryID
+                        WHERE p.ProductID IN
+                            (SELECT ProdID FROM `tbldiscount` d 
+                            LEFT JOIN tblproduct p on p.ProductID = d.ProdID
+                            WHERE d.Flat IS NOT NULL AND d.IsActive=1 AND p.IsApproved=1 AND p.IsActive=1
+                            Order BY d.Percentage DESC 
+                            ) AND p.IsApproved=1 AND p.IsActive=1
+                        LIMIT 6)
+                    
+                    UNION 
+                    
+                    (SELECT * FROM tblproduct p
+                        LEFT JOIN tblcategory c on p.CategoryID = c.CategoryID
+                        WHERE p.ProductID IN
+                            (SELECT ProdID FROM `tbldiscount` d 
+                            LEFT JOIN tblproduct p on p.ProductID = d.ProdID
+                            WHERE d.Percentage IS NOT NULL AND d.IsActive=1 AND p.IsApproved=1 AND p.IsActive=1
+                            Order BY d.Flat DESC 
+                            ) AND p.IsApproved=1 AND p.IsActive=1
+                            LIMIT 6)";
+         $stmt = $this->conn->prepare($query);
+         $stmt->execute();
+         return $stmt;
+
+        }else{
+            $query = "SELECT * FROM tblproduct p
+            LEFT JOIN tblcategory c on p.CategoryID = c.CategoryID
+            WHERE  p.IsApproved=1 AND p.IsActive=1
+            ORDER BY p.ProductID 
+            LIMIT 12";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindparam(":ids",$id);
+            $stmt->execute();
+            return $stmt;
+        }
+    }
+
+    
 
 }
 ?>
