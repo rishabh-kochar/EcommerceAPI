@@ -157,7 +157,7 @@ class Cart {
                 $Message .= "<p><b>Order Details Are As Follows</b></p>";
 
                 $CartProductData = $this->DisplayCart($id);
-                $i=0;
+                $i=1;
                 while ($row = $CartProductData->fetch(PDO::FETCH_ASSOC)){
                     
                     extract($row);
@@ -202,8 +202,8 @@ class Cart {
                         $Product = new Product($this->conn);
                         $ProductData = $Product->SingleProductData($ProductId);
                         $ProductDataRow = $ProductData->fetch(PDO::FETCH_ASSOC);
-                        $Message .= "<p>" . $i .") " . $ProductDataRow['ProductName'] . " * " .  $Qty . " = " . $Price  . "</p>"; 
-                        $ShopMessage = "<p>Order Details are As Follows: </p>"
+                        $Message .= "<p>" . $i .") " . $ProductDataRow['ProductName'] . " ( " . $Price  . " ) * " .  $Qty . " = </p>"; 
+                        $ShopMessage = "<p>Order Details are As Follows: </p>";
                         $ShopMessage .= "<p>" . $ProductDataRow['ProductName'] . " * " .  $Qty . " = " . $Price  . "</p>"; 
 
                         $Notification = new Notification($this->conn);

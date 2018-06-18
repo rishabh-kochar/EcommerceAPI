@@ -411,8 +411,9 @@ class Shops {
     }
 
     function SingleShop($id){
-        $query = "SELECT * FROM " . $this->table_name . " WHERE ShopID = " . $id;
+        $query = "SELECT * FROM " . $this->table_name . " WHERE ShopID=:id OR Email=:id OR PhoneNo=:id;";
         $stmt = $this->conn->prepare($query);
+        $stmt->bindparam(":id",$id);
         //echo $query;
         $stmt->execute();
         return $stmt;

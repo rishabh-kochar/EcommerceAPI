@@ -29,7 +29,7 @@ class SuperAdmin {
     function ReadInfo($id){
  
         // select all query
-        $query = "SELECT * FROM " . $this->table_name . " WHERE Adminid = :id";
+        $query = "SELECT * FROM " . $this->table_name . " WHERE Adminid = :id OR Email = :id OR PhoneNo=:id;";
 
         // prepare query statement
         // echo $query;
