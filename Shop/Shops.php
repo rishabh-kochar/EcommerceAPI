@@ -10,6 +10,7 @@ class Shops {
     // database connection and table name
     private $conn;
     private $table_name = "tblshops";
+    private $database;
  
     // object properties
     public $ShopID;
@@ -40,6 +41,7 @@ class Shops {
     // constructor with $db as database connection
     public function __construct($db){
         $this->conn = $db;
+        $database = new Database();
     }
 
     function SignUp(){
@@ -184,14 +186,17 @@ class Shops {
             }while($stmt->rowcount()>0);
 
             $randompassword = $this->randompassword(8);
+           
+            
+
       
-            $mail->Subject = "Welcome To" . $websitedata['Name'] ;
+            $Subject = "Welcome To " . $websitedata['Name'] ;
             $message = '<h1>Hello ' . $this->OwnerName . ',</h1>';
             $message .= '<p>Welcome to ' . $websitedata['Name'] . '</p>';
             $message .= '<p>The Login credential are as follows - </p>';
             $message .= '<p> Username : <b>' . $randomUsername . '</b> </p>';
             $message .= '<p> Password : <b>' . $randompassword . '</b> </p>';
-            $message .= '<p><a href="http://localhost:4200/login">Click Here To Login</a></p>';
+            $message .= '<p><a href="'. $this->database->AdminDomain() .'/login">Click Here To Login</a></p>';
 
 
             if(!$mail->send($Email,$Subject,$message))
@@ -328,7 +333,7 @@ class Shops {
                 $Subject = "Reset Password";
                 $generatedPassword = $this->randompassword(8);
                 $message = '<h1>Hello ' . $row['ShopName']  . '('. $row['OwnerName'] .'),</h1>';
-                $message .= '<p>To Reset Password <a href="http://localhost:4200/reset?rand=' . $randomString . '&type=shop">Click Here</a></p>';
+                $message .= '<p>To Reset Password <a href="http://'. $this->database->AdminDomain() .'/reset?rand=' . $randomString . '&type=shop">Click Here</a></p>';
                 $message .= '<p> Your Verification Code is : <b>' . $generatedPassword . '</b> </p>';
         
             
@@ -411,8 +416,9 @@ class Shops {
     }
 
     function SingleShop($id){
-        $query = "SELECT * FROM " . $this->table_name . " WHERE ShopID = " . $id;
+        $query = "SELECT * FROM " . $this->table_name . " WHERE ShopID=:id OR Email=:id OR PhoneNo=:id;";
         $stmt = $this->conn->prepare($query);
+        $stmt->bindparam(":id",$id);
         //echo $query;
         $stmt->execute();
         return $stmt;

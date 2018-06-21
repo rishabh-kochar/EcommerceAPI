@@ -18,11 +18,20 @@ $DispatchedDate = $data->DispatchedDate;
 $ArrivedTime = $data->ArrivedTime;
 $DispatchedTime = $data->DispatchedTime;
 
+// echo $ArrivedDate . "\n";
+// echo $ArrivedTime . "\n";
+// echo $DispatchedDate . "\n";
+// echo $DispatchedTime . "\n";
+
 $ArrivedTime = date("H:i", strtotime($ArrivedTime));
 $DispatchedTime = date("H:i", strtotime($DispatchedTime));
 
 $Tracking->ArrivedTime = date('Y-m-d H:i:s', strtotime("$ArrivedDate $ArrivedTime"));
 $Tracking->DispatchedTime = date('Y-m-d H:i:s', strtotime("$DispatchedDate $DispatchedTime"));
+
+// echo "\n" . $Tracking->ArrivedTime . "\n";
+// echo "\n" . $Tracking->DispatchedTime . "\n";
+
 // $AdminId = 1;
 // $Password = "store";
 //echo $Tracking->ArrivedTime . "\n";

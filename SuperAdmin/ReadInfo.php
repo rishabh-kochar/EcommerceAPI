@@ -11,10 +11,9 @@ $SuperAdmin = new SuperAdmin($db);
 $data = json_decode(file_get_contents("php://input"));
 
 $id = $data->ID;
-
+// echo $id;
 $stmt = $SuperAdmin->ReadInfo($id);
 $num = $stmt->rowCount();
- //echo $num;
 // check if more than 0 record found
 if($num>0){
  

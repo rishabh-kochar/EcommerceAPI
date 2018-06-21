@@ -3,6 +3,7 @@
 include_once '../config/database.php';
 include_once '../phpmailer/Mailer/Mail.php';
 require_once '../Notification/Notification.php';
+require_once '../Product/Product.php';
 
 
 class Cart {
@@ -102,7 +103,7 @@ class Cart {
     }
 
     function CheckOut($id,$Addressid,$Amt){ 
-        
+        $mail = new SendMail();
         $stmt = $this->DisplayCart($id);
         $num = $stmt->rowCount();
         if($num>0){
@@ -151,7 +152,12 @@ class Cart {
                 $lastid= $this->conn->lastinsertid();
                 $status = "Pending";
                 $Active = 1;
+
+                $Message = "<p><b>Your Order Has been Succesfully placed</b></p>";
+                $Message .= "<p><b>Order Details Are As Follows</b></p>";
+
                 $CartProductData = $this->DisplayCart($id);
+                $i=1;
                 while ($row = $CartProductData->fetch(PDO::FETCH_ASSOC)){
                     
                     extract($row);
@@ -179,7 +185,7 @@ class Cart {
                             }
                                 
                         }
-
+                        //echo $Price;
                         $query = "INSERT INTO tblorderdetails(OrderID, ProductID, Qty, Price, Status, IsActive, OrderUpdatedOn)
                                     VALUES (:OrderID,:ProductID,:Qty,:Price,:Status,:IsActive,:time)";
                         $stmt1 = $this->conn->prepare($query);
@@ -192,6 +198,30 @@ class Cart {
                         $stmt1->bindparam(":time",$time);
                         $stmt1->execute();
                         $OrderDetailsId = $this->conn->lastinsertid();
+
+                        $Product = new Product($this->conn);
+                        $ProductData = $Product->SingleProductData($ProductId);
+                        $ProductDataRow = $ProductData->fetch(PDO::FETCH_ASSOC);
+                        $Message .= "<p>" . $i .") " . $ProductDataRow['ProductName'] . " ( " . $Price  . " ) * " .  $Qty . " = </p>"; 
+                        $ShopMessage = "<p>Order Details are As Follows: </p>";
+                        $ShopMessage .= "<p>" . $ProductDataRow['ProductName'] . " * " .  $Qty . " = " . $Price  . "</p>"; 
+
+                        $Notification = new Notification($this->conn);
+                        $Notification->URL = "/orderDetail";
+                        $Notification->Type = $ShopID;
+                        $Notification->Image = "fa-file-alt";
+                        $Notification->IsRead = "0";
+                        $Notification->NotificationText = "Order for ". $ProductDataRow['ProductName'] ." Arrived.";
+                        $Notification->CreatedOn = date('Y-m-d H:i:s');
+                        $Notification->AddNotification();
+
+                        $query = "SELECT * FROM tblshops WHERE ShopID=:id";
+                        $stmt1 = $this->conn->prepare($query);
+                        $stmt1->bindparam(":id",$ShopID);
+                        $stmt1->execute();
+                        $ShopData = $stmt1->fetch(PDO::FETCH_ASSOC);
+                        $Subject = "Order Arrived.";
+                        $mail->send($ShopData['Email'],$Subject,$ShopMessage);
 
                         $status = "Pending";
                         $text = "Order has been Placed.";
@@ -206,22 +236,29 @@ class Cart {
                         $stmt1->bindparam(":Status",$status);
                         $stmt1->execute();
 
-                        $Notification = new Notification($this->conn);
-                        $Notification->URL = "/orderDetail";
-                        $Notification->Type = $ShopID;
-                        $Notification->Image = "fa-file-alt";
-                        $Notification->IsRead = "0";
-                        $Notification->NotificationText = "Order Arrived.";
-                        $Notification->CreatedOn = date('Y-m-d H:i:s');
-                        $Notification->AddNotification();
-
+                       
+                        $sellerID = $ShopID;
+                        
                         $query = "DELETE FROM tblcart WHERE CartID=:id";
                         $stmt1 = $this->conn->prepare($query);
                         $stmt1->bindparam(":id",$CartID);
                         $stmt1->execute();
 
-                       
+                       $i++;
                     }
+
+                    
+
+                    //$mail = new SendMail();
+                    $query = "SELECT * FROM tbluser WHERE UserID=:id";
+                    $stmt1 = $this->conn->prepare($query);
+                    $stmt1->bindparam(":id",$id);
+                    $stmt1->execute();
+                    $row = $stmt1->fetch(PDO::FETCH_ASSOC);
+                    extract($row);
+                    $Subject = "Order Placed.";
+                    $Message .= "<p>Total Amount = " . $Amt . "</p>";
+                    $mail->send($Email,$Subject,$Message);
                     return '{"key":"true"}';
             }else{
                 return '{"key":"false"}';

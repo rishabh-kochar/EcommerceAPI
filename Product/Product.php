@@ -264,6 +264,291 @@ class Product {
         return $stmt;
     }
 
+    function CategoryFilter($id){
+        $query = "SELECT * FROM tblcategoryproperties c
+                    WHERE c.CategoryID = :id AND c.IsFilter = 1 ORDER BY c.ColumnOrder;";
+         $stmt = $this->conn->prepare($query);
+         $stmt->bindparam(":id",$id);
+         $stmt->execute();
+         return $stmt;
+    } 
+
+    function FilterData($id,$Search,$min,$max,$Properties){
+        $stmt = $this->GetCategoryProduct($id);
+        $size = sizeof($Properties);
+        $num = $stmt->rowCount();
+    
+        if($num>0){
+            $shop_arr=array();
+            $shop_arr["records"]=array();
+            while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
+                extract($row);
+           
+                $str = "";
+                $flag = 1;
+
+                //echo $ProductName . " " . $Search . "\n";
+                if($Search != ""){
+                    if(stripos($ProductName, $Search) === false){
+                        $flag = 0;
+                        //echo "false \n";
+                    }
+                        
+                }
+
+                if(!($Price >= $min && $Price <= $max))
+                    $flag=0;
+
+                if($flag == 1){
+                    for($i=0;$i<$size;$i++){
+                   
+                        $key = $Properties[$i]->key;
+                        $value = $Properties[$i]->value;
+                        //echo $key . "\n";
+                        if($value != ""){
+                            $str = "(CategoryPropertyID = " . $key . " AND Value LIKE '" . $value . "')";
+                            $query = "SELECT * FROM tblcategorypropertiesvalues 
+                                        WHERE ProductID=".$ProductId." AND " . $str;
+                            $stmt1 = $this->conn->prepare($query);
+                            //$stmt1->bindparam(":id",$ProductID);
+                            //echo $query . "\n";
+                            $stmt1->execute();
+                            if($stmt1->rowcount()==0)
+                                $flag=0;
+                        }
+                        if($flag==0)
+                            break;
+                            
+                    }
+                }
+               
+              
+                if($flag==1){
+                    $query = "SELECT * FROM tblcategoryproperties WHERE CategoryID=:id ORDER BY ColumnOrder";
+                    $stmt1 = $this->conn->prepare($query);
+                    $stmt1->bindparam(":id",$CategoryId);
+                    $stmt1->execute();
+                
+                    $num = $stmt1->rowCount();
+                    $flag = 0;
+                    if($num>0){
+                        $properties=array();    
+                        while ($row = $stmt1->fetch(PDO::FETCH_ASSOC)){
+                            extract($row);
+
+                            if($flag == 0){
+                                $query = "SELECT * FROM tblcategorypropertiesvalues WHERE ProductID=:pid AND CategoryPropertyID=:cid";
+                                $stmtvalue = $this->conn->prepare($query);
+                                $stmtvalue->bindparam(":pid",$ProductId);
+                                $stmtvalue->bindparam(":cid",$CategoryPropertyID);
+                                $stmtvalue->execute();
+
+                                if($stmtvalue->rowcount()>0){
+                                    $rowvalue = $stmtvalue->fetch(PDO::FETCH_ASSOC);
+                                    $value = $rowvalue['Value'];
+                                }else{
+                                    $flag=1;
+                                    $value = "";
+                                }
+                            }
+                                    
+                            $properties_item["IsFilter"]=$IsFilter;
+                            $properties_item["PropertyName"]=$PropertyName;
+                            $properties_item["Value"]=$value;
+                            
+                            array_push($properties, $properties_item);
+                        }
+                    }else{
+                        $properties = null;
+                    }
+
+                    //Product Image
+                    $query = "SELECT * FROM tblproductimage WHERE ProductID=:id";
+                    $stmt1 = $this->conn->prepare($query);
+                    $stmt1->bindparam(":id",$ProductId);
+                    $stmt1->execute();
+            
+                    $image_arr=array();
+            
+                    while($ImageData = $stmt1->fetch(PDO::FETCH_ASSOC)){
+                        $image_item['id']=$ImageData['id'];
+                        $image_item['image']=$ImageData['Image'];
+                        array_push($image_arr, $image_item);
+                    }
+
+                    //Discount
+
+                    $query = "SELECT * FROM tbldiscount WHERE ProdID=:id AND IsActive=1";
+                    $stmt1 = $this->conn->prepare($query);
+                    $stmt1->bindparam(":id",$ProductId);
+                    $stmt1->execute();
+                                
+                    $num = $stmt1->rowcount();
+                    if($num>0){
+                        $DiscountData = $stmt1->fetch(PDO::FETCH_ASSOC);
+                        if(isset($DiscountData['Flat'])){
+                            $discount_arr = array(
+                                "Type" => "1",
+                                "Flat" =>  $DiscountData['Flat']
+                            );
+                            $finalPrice = $Price - $DiscountData['Flat'];
+                        }
+                                    
+                        if(isset($DiscountData['Percentage'])){
+                            $discount_arr = array(
+                                "Type" => "2",
+                                "Percentage" =>  $DiscountData['Percentage']
+                            );
+                            $finalPrice = $Price - ($Price * $DiscountData['Percentage'])/100;
+                        }
+                                        
+                    }else{
+                        $discount_arr = null;
+                        $finalPrice = 0;
+                    }
+
+                    if($IsActive == 1)
+                        $IsActive = "Yes";
+                    else
+                        $IsActive = "No";
+
+                    $shop_item=array(
+                        "ProductID" => $ProductId,
+                        "CategoryID" => $CategoryId,
+                        "ProductName" => $ProductName,
+                        "ProductDesc" => $ProductDesc,
+                        "CategoryName" => $CategoryName,
+                        "ImageAlt" => $ImageAlt,
+                        "Price" => $Price,
+                        "Unit" => $Unit,
+                        "MinStock" => $MinStock,
+                        "CurrentStock" => $CurrentStock,
+                        "IsActive" => $IsActive,
+                        "IsApproved" => $IsApproved,
+                        "LastStockUpdatedOn" => $LastStockUpdatedOn,
+                        "CreatedOn" => $CreatedOn,
+                        "LastUpdatedOn" => $LastUpdatedOn,
+                        "image" => $image_arr,
+                        "Properties" => $properties,
+                        "Discount" => $discount_arr,
+                        "FinalPrice" => $finalPrice
+                    );
+
+                    array_push($shop_arr["records"], $shop_item);
+                }
+
+            }
+            return json_encode($shop_arr);
+        }else{
+            return '{"key":"false"}';
+        }
+    }
+
+    function ProductSearch($Search){
+        $query = "SELECT * FROM tblproduct p
+                    LEFT JOIN tblcategory c on p.CategoryID = c.CategoryID
+                     WHERE p.ProductName LIKE :name AND p.IsApproved=1 AND p.IsActive=1";
+        $stmt = $this->conn->prepare($query);
+        $Search = "%".$Search."%";
+        $stmt->bindparam(":name",$Search);
+        $stmt->execute();
+        return $stmt;
+    }
+
+    function MostSelledProduct(){
+        $query = "SELECT ProductID,count(*) cnt FROM tblorderdetails
+                    Group BY ProductID
+                    Order By cnt desc
+                    Limit 12";
+         $stmt = $this->conn->prepare($query);
+         $stmt->execute();
+         if($stmt->rowcount()>=4){
+            $str = "";
+            while($row=$stmt->fetch(PDO::FETCH_ASSOC)){
+                $str .= $row['ProductID'] . ",";
+            }
+            $str .= "0";
+            //echo $query;
+            $query = "SELECT * FROM tblproduct p
+                        LEFT JOIN tblcategory c on p.CategoryID = c.CategoryID
+                        WHERE p.ProductID IN (" . $str ." ) AND p.IsApproved=1 AND p.IsActive=1";
+                        $stmt = $this->conn->prepare($query);
+                        //echo $query;
+                        $stmt->execute();
+                    return $stmt;
+         }else{
+            $query = "SELECT * FROM tblproduct p
+                        LEFT JOIN tblcategory c on p.CategoryID = c.CategoryID
+                        WHERE  p.IsApproved=1 AND p.IsActive=1
+                        ORDER BY p.ProductID DESC
+                        LIMIT 12";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindparam(":ids",$id);
+            $stmt->execute();
+            return $stmt;
+         }
+
+    }
+
+    function PercentageDiscountProduct(){
+
+
+        $query = "(SELECT Count(*) cnt FROM `tbldiscount` d 
+                    WHERE d.Flat IS NOT NULL and d.IsActive=1)";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        $Flat = $row['cnt'];
+
+        $query = "(SELECT Count(*) cnt FROM `tbldiscount` d 
+            WHERE d.Percentage IS NOT NULL and d.IsActive=1)";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        $Percentage = $row['cnt'];
+                    
+        
+
+        if($Flat>=2 && $Percentage>=2){
+            $query = "(SELECT * FROM tblproduct p
+                        LEFT JOIN tblcategory c on p.CategoryID = c.CategoryID
+                        WHERE p.ProductID IN
+                            (SELECT ProdID FROM `tbldiscount` d 
+                            LEFT JOIN tblproduct p on p.ProductID = d.ProdID
+                            WHERE d.Flat IS NOT NULL AND d.IsActive=1 AND p.IsApproved=1 AND p.IsActive=1
+                            Order BY d.Percentage DESC 
+                            ) AND p.IsApproved=1 AND p.IsActive=1
+                        LIMIT 6)
+                    
+                    UNION 
+                    
+                    (SELECT * FROM tblproduct p
+                        LEFT JOIN tblcategory c on p.CategoryID = c.CategoryID
+                        WHERE p.ProductID IN
+                            (SELECT ProdID FROM `tbldiscount` d 
+                            LEFT JOIN tblproduct p on p.ProductID = d.ProdID
+                            WHERE d.Percentage IS NOT NULL AND d.IsActive=1 AND p.IsApproved=1 AND p.IsActive=1
+                            Order BY d.Flat DESC 
+                            ) AND p.IsApproved=1 AND p.IsActive=1
+                            LIMIT 6)";
+         $stmt = $this->conn->prepare($query);
+         $stmt->execute();
+         return $stmt;
+
+        }else{
+            $query = "SELECT * FROM tblproduct p
+            LEFT JOIN tblcategory c on p.CategoryID = c.CategoryID
+            WHERE  p.IsApproved=1 AND p.IsActive=1
+            ORDER BY p.ProductID 
+            LIMIT 12";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindparam(":ids",$id);
+            $stmt->execute();
+            return $stmt;
+        }
+    }
+
+    
 
 }
 ?>

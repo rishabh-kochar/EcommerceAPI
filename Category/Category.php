@@ -370,10 +370,7 @@ class Category {
                     $stmt->bindparam(":CategoryPropertyID",$this->CategoryPropertyID);
                     $stmt->bindparam(":Value",$this->value);
                     if(!$stmt->execute())
-                        $j=1;
-                
-                
-                
+                        $j=1;  
             }else{
                 $this->CategoryPropertyID = $property[$i]->ID;
                 $this->value = $property[$i]->Value;
@@ -399,6 +396,26 @@ class Category {
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt;
+    }
+
+    function TopCategory(){
+        $query = "SELECT CategoryID, count(*) cnt FROm tblorderdetails od
+                    LEFT JOIN tblproduct as p on od.ProductID = p.ProductId
+                    GROUP BY p.CategoryID
+                    ORDER BY cnt desc
+                    LIMIT 3";
+          $stmt = $this->conn->prepare($query);
+          $stmt->execute();
+          if($stmt->rowcount() == 3)
+            return $stmt;
+        else{
+            $query = "SELECT CategoryID FROM tblcategory c
+                        ORDER BY CategoryID DESC
+                        LIMIT 3";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute();
+            return $stmt;
+        }
     }
 
     

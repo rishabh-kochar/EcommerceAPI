@@ -26,7 +26,7 @@ if($num>0){
             "OrderID" => $OrderID,
           "ProductName" => $ProductName,
           "Qty" => $Qty,
-          "Price" => $Price,
+          "Price" => $FPrice,
           "PhoneNo" => $PhoneNo,
           "City" => $City,
           "Status" => $Status,

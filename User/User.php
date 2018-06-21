@@ -8,6 +8,7 @@ class User {
     // database connection and table name
     private $conn;
     private $table_name = "tbluser";
+    private $database;
  
     // object properties
     public $UserID;
@@ -39,6 +40,7 @@ class User {
     // constructor with $db as database connection
     public function __construct($db){
         $this->conn = $db;
+        $database = new Database();
     }
 
     function UserDetailsOrder($id,$cid){
@@ -153,7 +155,7 @@ class User {
                 $Subject = "Reset Password";
                 $generatedPassword = $this->randompassword(8);
                 $message = '<h1>Hello ' . $row['Name'];
-                $message .= '<p>To Reset Password <a href="http://localhost:4200/reset?rand=' . $randomString . '&type=shop">Click Here</a></p>';
+                $message .= '<p>To Reset Password <a href="http://'. $this->database->ClientDomain() .'/reset?rand=' . $randomString . '&type=shop">Click Here</a></p>';
                 $message .= '<p> Your Verification Code is : <b>' . $generatedPassword . '</b> </p>';
         
             

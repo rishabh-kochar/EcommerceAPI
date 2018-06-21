@@ -53,8 +53,8 @@ if($CategoryImage != ""){
            $errors[]="extension not allowed, please choose a JPEG or PNG file.";
         }
         
-        if($file_size > 2097152){
-           $errors[]='File size must be less than 2 MB';
+        if($file_size > 2097152000){
+           $errors[]='File size must be less than 20 MB';
         }
         
         if(empty($errors)==true){
