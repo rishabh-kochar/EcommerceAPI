@@ -153,7 +153,7 @@ class User {
                 $Subject = "Reset Password";
                 $generatedPassword = $this->randompassword(8);
                 $message = '<h1>Hello ' . $row['Name'];
-                $message .= '<p>To Reset Password <a href="http://localhost:4200/reset?rand=' . $randomString . '&type=shop">Click Here</a></p>';
+                $message .= '<p>To Reset Password <a href="http://'. $this->database->ClientDomain() .'/reset?rand=' . $randomString . '&type=shop">Click Here</a></p>';
                 $message .= '<p> Your Verification Code is : <b>' . $generatedPassword . '</b> </p>';
         
             

@@ -10,6 +10,7 @@ class Shops {
     // database connection and table name
     private $conn;
     private $table_name = "tblshops";
+    private $database = new Database();
  
     // object properties
     public $ShopID;
@@ -184,6 +185,9 @@ class Shops {
             }while($stmt->rowcount()>0);
 
             $randompassword = $this->randompassword(8);
+           
+            
+
       
             $mail->Subject = "Welcome To" . $websitedata['Name'] ;
             $message = '<h1>Hello ' . $this->OwnerName . ',</h1>';
@@ -191,7 +195,7 @@ class Shops {
             $message .= '<p>The Login credential are as follows - </p>';
             $message .= '<p> Username : <b>' . $randomUsername . '</b> </p>';
             $message .= '<p> Password : <b>' . $randompassword . '</b> </p>';
-            $message .= '<p><a href="http://localhost:4200/login">Click Here To Login</a></p>';
+            $message .= '<p><a href="'. $this->database->AdminDomain() .'/login">Click Here To Login</a></p>';
 
 
             if(!$mail->send($Email,$Subject,$message))
@@ -328,7 +332,7 @@ class Shops {
                 $Subject = "Reset Password";
                 $generatedPassword = $this->randompassword(8);
                 $message = '<h1>Hello ' . $row['ShopName']  . '('. $row['OwnerName'] .'),</h1>';
-                $message .= '<p>To Reset Password <a href="http://localhost:4200/reset?rand=' . $randomString . '&type=shop">Click Here</a></p>';
+                $message .= '<p>To Reset Password <a href="http://'. $this->database->AdminDomain() .'/reset?rand=' . $randomString . '&type=shop">Click Here</a></p>';
                 $message .= '<p> Your Verification Code is : <b>' . $generatedPassword . '</b> </p>';
         
             

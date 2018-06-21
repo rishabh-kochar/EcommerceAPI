@@ -191,7 +191,7 @@ class SuperAdmin {
                 $mail->Subject = "Reset Password";
                 $generatedPassword = $this->randompassword(8);
                 $message = '<h1>Hello ' . $AdminName . ',</h1>';
-                $message .= '<p>To Reset Password <a href="http://localhost:4200/reset?rand=' . $randomString . '&type=admin">Click Here</a></p>';
+                $message .= '<p>To Reset Password <a href="http://'.  $this->database->AdminDomain()  .'/reset?rand=' . $randomString . '&type=admin">Click Here</a></p>';
                 $message .= '<p> Your Verification Code is : <b>' . $generatedPassword . '</b> </p>';
         
                 

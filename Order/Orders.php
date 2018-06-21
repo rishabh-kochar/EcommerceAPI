@@ -10,6 +10,7 @@ class Order {
     // database connection and table name
     private $conn;
     private $table_name = "tblorders";
+    private $database = new Database();
      
     // object properties
     public $OrderID;
@@ -128,7 +129,7 @@ class Order {
                 $Subject = "Order Out For Delivery.";
                 $Message = "<p>Your Order Has Been Out For delivery.</p>";
                 $Message .= "<p>" . $userData['ProductName']  . " ( " . $userData['FPrice'] ." ) * "  . $userData['Qty'] . "</p>";
-                $Message .= "<p><a href='http://localhost:4200/orderDetail?ODID='" . $this->OrderDetailsID . "> Click Here To Track</a></p>";
+                $Message .= "<p><a href='http://". $this->database->ClientDomain() ."/orderDetail?ODID='" . $this->OrderDetailsID . "> Click Here To Track</a></p>";
                 $Message .= "<p> <b>Order No: </b> " . $this->OrderDetailsID . "</p>";
                 $mail->send($Email,$Subject,$Message);
 
@@ -238,7 +239,7 @@ class Order {
                     $Subject = "Order Dispatched.";
                     $Message = "<p>Your Order Has Been Dispatched.</p>";
                     $Message .= "<p>" . $userData['ProductName']  . " ( " . $userData['FPrice'] ." ) * "  . $userData['Qty'] . "</p>";
-                    $Message .= "<p><a href='http://localhost:4200/orderDetail?ODID='" . $this->OrderDetailsID . "> Click Here To Track</a></p>";
+                    $Message .= "<p><a href='http://". $this->database->ClientDomain() ."/orderDetail?ODID='" . $this->OrderDetailsID . "> Click Here To Track</a></p>";
                     $Message .= "<p> <b>Order No: </b> " . $this->OrderDetailsID . "</p>";
                     $mail->send($Email,$Subject,$Message);
 

@@ -13,15 +13,18 @@ ini_set('display_errors','1');
 class Database{
  
     // specify your own database credentials
-    private $host = "localhost";
-    private $db_name = "onlinestore";
-    private $username = "root";
-    private $password = "";
+    // private $host = "localhost";
+    // private $db_name = "onlinestore";
+    // private $username = "root";
+    // private $password = "";
 
-    // private $host = "209.99.16.19:3306";
-    // private $db_name = "OnlineStore";
-    // private $username = "Rishabh";
-    // private $password = "Loveyourself2509";
+    private $host = "209.99.16.19:3306";
+    private $db_name = "OnlineStore";
+    private $username = "Rishabh";
+    private $password = "Loveyourself2509";
+    private $AdminDomain = "onlineStoreapp1.herokuapp.com";
+    private $ClientDomain = "clientstore.herokuapp.com";
+
     public $conn;
  
     // get the database connection
@@ -39,6 +42,14 @@ class Database{
         }
  
         return $this->conn;
+    }
+
+    function AdminDomain(){
+        return $this->AdminDomain;
+    }
+
+    function ClientDomain(){
+        return $this->ClientDomain;
     }
 
     public function notification_time($d1){
