@@ -240,7 +240,7 @@ class Order {
                     $Subject = "Order Dispatched.";
                     $Message = "<p>Your Order Has Been Dispatched.</p>";
                     $Message .= "<p>" . $userData['ProductName']  . " ( " . $userData['FPrice'] ." ) * "  . $userData['Qty'] . "</p>";
-                    $Message .= "<p><a href='http://" . $this->database->ClientDomain() . "/orderDetail?ODID=" . $this->OrderDetailsID . "'> Click Here To Track</a></p>";
+                    $Message .= "<p><a href='http://". $this->database->ClientDomain() ."/orderDetail?ODID=" . $this->OrderDetailsID . "'> Click Here To Track</a></p>";
                     $Message .= "<p> <b>Order No: </b> " . $this->OrderDetailsID . "</p>";
                     $mail->send($Email,$Subject,$Message);
 
