@@ -10,7 +10,7 @@ class Order {
     // database connection and table name
     private $conn;
     private $table_name = "tblorders";
-    private $database = new Database();
+    private $database;
      
     // object properties
     public $OrderID;
@@ -33,6 +33,7 @@ class Order {
     // constructor with $db as database connection
     public function __construct($db){
         $this->conn = $db;
+        $database = new Database();
     }
 
     function GetOrders(){

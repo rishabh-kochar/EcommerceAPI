@@ -10,7 +10,7 @@ class Shops {
     // database connection and table name
     private $conn;
     private $table_name = "tblshops";
-    private $database = new Database();
+    private $database;
  
     // object properties
     public $ShopID;
@@ -41,6 +41,7 @@ class Shops {
     // constructor with $db as database connection
     public function __construct($db){
         $this->conn = $db;
+        $database = new Database();
     }
 
     function SignUp(){
@@ -189,7 +190,7 @@ class Shops {
             
 
       
-            $mail->Subject = "Welcome To" . $websitedata['Name'] ;
+            $Subject = "Welcome To " . $websitedata['Name'] ;
             $message = '<h1>Hello ' . $this->OwnerName . ',</h1>';
             $message .= '<p>Welcome to ' . $websitedata['Name'] . '</p>';
             $message .= '<p>The Login credential are as follows - </p>';

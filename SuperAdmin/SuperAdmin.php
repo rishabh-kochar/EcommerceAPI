@@ -8,6 +8,7 @@ class SuperAdmin {
     // database connection and table name
     private $conn;
     private $table_name = "tbladmin";
+    private $database;
  
     // object properties
     public $id;
@@ -24,6 +25,7 @@ class SuperAdmin {
     // constructor with $db as database connection
     public function __construct($db){
         $this->conn = $db;
+        $database = new Database();
     }
 
     function ReadInfo($id){

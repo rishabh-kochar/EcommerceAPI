@@ -8,6 +8,7 @@ class User {
     // database connection and table name
     private $conn;
     private $table_name = "tbluser";
+    private $database;
  
     // object properties
     public $UserID;
@@ -39,6 +40,7 @@ class User {
     // constructor with $db as database connection
     public function __construct($db){
         $this->conn = $db;
+        $database = new Database();
     }
 
     function UserDetailsOrder($id,$cid){
