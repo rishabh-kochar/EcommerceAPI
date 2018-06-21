@@ -21,7 +21,7 @@ if($num>0){
         $shop_item=array(
             "ShopID" => $ShopID,
             "ShopName" => $ShopName,
-            "CreatedOn" => $CreatedOn,
+            "CreatedOn" => $database->notification_time( $CreatedOn),
             "LogoImage" => $LogoImage
         );
  

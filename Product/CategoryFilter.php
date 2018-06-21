@@ -1,6 +1,6 @@
 <?php
 
-include_once '../config/database.php';
+require_once '../Config/Database.php';
 include_once './Product.php';
 
 $database = new Database();
@@ -24,7 +24,7 @@ if($num>0){
     $shop_arr["records"]=array();
 
     $query = "SELECT max(Price) maxPrice,min(Price) minPrice FROM tblproduct p 
-                Where p.CategoryID = :id AND p.IsApproved=1 AND p.IsActive=1;;";
+                Where p.CategoryID = :id AND p.IsApproved=1 AND p.IsActive=1;";
     $stmt1 = $db->prepare($query);
     $stmt1->bindparam(":id",$id);
     $stmt1->execute();

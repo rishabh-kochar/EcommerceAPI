@@ -105,7 +105,7 @@ class Dashboard {
         $TotalProducts = $this->SellerProductCount($id);
         $TotalUsers = $this->GETCounts('tbluser');
         $TotalOrders = $this->SellerOrderCount($id);
-        $TotalValue = $this->TotalOrderValue($id);
+        $TotalValue = $this->TotalOrderValue($id); 
 
         $items = array(
             "Products" => $TotalProducts,

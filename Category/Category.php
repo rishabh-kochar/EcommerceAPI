@@ -398,6 +398,26 @@ class Category {
         return $stmt;
     }
 
+    function TopCategory(){
+        $query = "SELECT CategoryID, count(*) cnt FROm tblorderdetails od
+                    LEFT JOIN tblproduct as p on od.ProductID = p.ProductId
+                    GROUP BY p.CategoryID
+                    ORDER BY cnt desc
+                    LIMIT 3";
+          $stmt = $this->conn->prepare($query);
+          $stmt->execute();
+          if($stmt->rowcount() == 3)
+            return $stmt;
+        else{
+            $query = "SELECT CategoryID FROM tblcategory c
+                        ORDER BY CategoryID DESC
+                        LIMIT 3";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute();
+            return $stmt;
+        }
+    }
+
     
 
 }

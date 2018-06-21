@@ -17,20 +17,28 @@ $num = $stmt->rowCount();
  //echo $num;
 // check if more than 0 record found
 if($num>0){
-
     $shop_arr=array();
-    $shop_arr["records"]=array();
- 
- 
+   
+    $i=0;
+    $j=0;
+    $shop_arr = array();
+    $shop_arr[0] = array();
     while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
+
+    
+        if($j>=4){
+            $shop_arr[++$i] = array();
+            $j=0;
+        }
+
         extract($row);
         $query = "SELECT * FROM tblproductimage WHERE ProductID=:id LIMIT 1";
         $stmt1 = $db->prepare($query);
         $stmt1->bindparam(":id",$ProductId);
         $stmt1->execute();
         //echo $ProductId;
-
         $ImageData = $stmt1->fetch(PDO::FETCH_ASSOC);
+
 
         $query = "SELECT * FROM tbldiscount WHERE ProdID=:id AND IsActive=1";
         $stmt1 = $db->prepare($query);
@@ -62,6 +70,8 @@ if($num>0){
             $finalPrice = 0;
         }
         
+        
+
        
 
 
@@ -93,18 +103,17 @@ if($num>0){
 
         );
 
-        array_push($shop_arr["records"], $shop_item);
-
-    }
         
-       
-    
- 
+        
+        array_push($shop_arr[$i], $shop_item);
+        $j++;
+    }
     echo json_encode($shop_arr);
 }
- 
+
+
+
 else{
     echo '{"key":"false"}';
 }
-
 ?>

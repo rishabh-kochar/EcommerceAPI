@@ -462,7 +462,7 @@ class Product {
                     Limit 12";
          $stmt = $this->conn->prepare($query);
          $stmt->execute();
-         if($stmt->rowcount()>0){
+         if($stmt->rowcount()>=4){
             $str = "";
             while($row=$stmt->fetch(PDO::FETCH_ASSOC)){
                 $str .= $row['ProductID'] . ",";
