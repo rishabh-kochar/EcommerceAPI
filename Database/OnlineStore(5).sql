@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 209.99.16.19:3306
--- Generation Time: Jun 21, 2018 at 10:56 AM
+-- Generation Time: Jun 21, 2018 at 11:04 AM
 -- Server version: 5.6.39
 -- PHP Version: 5.6.30
 
@@ -77,7 +77,7 @@ CREATE TABLE `tbladmin` (
 --
 
 INSERT INTO `tbladmin` (`AdminId`, `AdminName`, `AdminImage`, `PhoneNo`, `Email`, `Password`, `OldPassword`, `VerificationCode`, `RandomString`, `RandomStringTime`, `PasswordUpdatedOn`, `CreatedOn`, `IsSessionActive`) VALUES
-(1, 'Rishabh Kochar', '20180522163728_photo2.png', '9016111959', 'rishabhkochar58@gmail.com', '1234', '12', '7FiTnAEj', NULL, NULL, '2018-05-22 16:39:38', '2018-05-09 00:00:00', 1),
+(1, 'Admin', '20180522163728_photo2.png', '1234567880', 'Example@gmail.com', '1234', '12', '7FiTnAEj', NULL, NULL, '2018-05-22 16:39:38', '2018-05-09 00:00:00', 1),
 (4, 'Bhumi Patel', '20180523150948_2013-12-14_zh-cn11425960734_e58aa0e588a9e7a68fe5b0bce4ba9ae5b79ee79a84e6aca7e69687e696afe8b0b7e4b8adefbc8ce799bde69da8efbc8ce69fb3e6a091e.jpg', '1234567890', 'bhumi@gmail.com', 'abc', '123', NULL, NULL, NULL, '2018-05-30 16:49:39', '2018-05-16 00:00:00', 1),
 (5, 'Ritesh Tailor', '20180621120947_user6-128x128.jpg', '8866699878', 'rdtailor@gmail.com', '159', '123', 'PjlUZ2ua', 'AeCuYftGn9', '2018-05-17 13:43:00', '2018-06-19 13:17:56', '2018-05-16 00:00:00', 1);
 
